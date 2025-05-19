@@ -32,7 +32,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="main.c">
+    <Unit filename="src/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>
