@@ -1,7 +1,6 @@
 #include "funciones.h"
 
-/*Para la primera parte solo faltaria, agregar el campo extra, implementar el TDA fecha de mierda
-y corregir la "construccion" de RegistroIndice*/
+/*Para la primera parte solo faltaria, agregar el campo extra, implementar el TDA fecha y corregir la "construccion" de RegistroIndice*/
 
 /*Funcion auxiliar, para saber si un int es par*/
 int esPar(int n)
