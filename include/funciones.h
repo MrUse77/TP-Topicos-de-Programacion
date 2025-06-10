@@ -1,43 +1,45 @@
-#ifndef FUNCIONES_H_INCLUDED
-#define FUNCIONES_H_INCLUDED
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 
-#define NOMBRE_ARCH_INDICES_GENERAL "indices_icc_general_capitulos.txt"
-#define NOMBRE_ARCH_INDICES_OBRA "Indices_items_obra.txt"
+/* Nombres de archivos */
 #define NOMBRE_ARCH_AUXILIAR "auxiliar.tmp"
 
-#define FORMATO_GENERAL "%[^;];%[^;];%[^;]"
+#define FORMATO_REGISTROS "\"%[^\"]\";\"%[^\"]\";%[^;]"
+#define FORMATO_CABECERA "\"%[^\"]\";\"%[^\"]\";\"%[^\"]\""
 
+/* Estados de retorno */
+#define TODO_OK 0
+#define ERR_ARCHIVO 1
+#define ERR_BUFFER_CORTO 2
+
+/* Tamaños para strings */
 #define BUFFER_TAM 255
 
-#define PERIODO_TAM 15
-#define NIVEL_TAM 30
-#define INDICE_TAM 15
+#define PERIODO_TAM 11
+/* Algunos valores en nivel_general_aperturas de indices_items_obras.csv poseen hasta 40 caracteres */
+#define NIVEL_TAM 41 
+#define INDICE_TAM 17
+#define CLASIFICADOR_TAM 14
+
+/* Booleanos */
+#define bool int
+#define false 0
+#define true 1
 
 typedef struct{
-    char* buffer;
-    int* indices;
-}Registro;
+    char periodo[PERIODO_TAM];
+    char nivel[NIVEL_TAM];
+    char indiceICC[INDICE_TAM];
+    char clasificador[CLASIFICADOR_TAM];
+} Registro;
 
-typedef struct{
-    char* periodo;
-    char* nivel;
-    char* indiceICC;
-}RegistroIndice;
+typedef void (*Formatear) (Registro* reg);
 
-int esPar(int n);
-int esLetra(char* c);
-int aMayus(char* c);
+int copiarArchivoTxt (char* nomArchDest, char* nomArchOrig);
+int corregirArchivo (char* nomArchOrig, Formatear realizarFormateos);
+void formatearNivelGeneral (Registro* reg);
+void formatearItemsObra (Registro* reg);
 
-RegistroIndice* inicializarRegistroIndice(RegistroIndice* registros);
-void destruirRegistroIndice(RegistroIndice* registros);
-int corregirFormatoDeIndicesGeneral(FILE* archivo);
-char* corregirFormatoDeFecha(RegistroIndice* registro);
-char* agregarCeroALaIzquierda(RegistroIndice* registro);
-char* desencriptarNivelGeneral(RegistroIndice* registro);
-char* normalizarNivelSinGuiones(RegistroIndice* registro);
-char* corregirFormatoDecimal(RegistroIndice* registro); 
-
-#endif
+char* concatenarString (char* str1, const char* str2, size_t lim);
+char* copiarString (char* dest, const char* orig, size_t lim);

@@ -1,0 +1,16 @@
+# depslib dependency file v1.0
+1749586617 source:e:\programacion\c\tp-topicos-de-programacion\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"include/funciones.h"
+
+1749585095 e:\programacion\c\tp-topicos-de-programacion\include\funciones.h
+	<stdio.h>
+	<stdlib.h>
+	<stddef.h>
+
+1749586303 source:e:\programacion\c\tp-topicos-de-programacion\src\funciones.c
+	"../include/funciones.h"
+	<string.h>
+
