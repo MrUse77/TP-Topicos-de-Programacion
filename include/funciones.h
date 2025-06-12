@@ -1,3 +1,6 @@
+#ifndef FUNCIONES_H_INCLUDED
+#define FUNCIONES_H_INCLUDED
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -41,5 +44,6 @@ int corregirArchivo (char* nomArchOrig, Formatear realizarFormateos);
 void formatearNivelGeneral (Registro* reg);
 void formatearItemsObra (Registro* reg);
 
+#endif
 char* concatenarString (char* str1, const char* str2, size_t lim);
 char* copiarString (char* dest, const char* orig, size_t lim);
