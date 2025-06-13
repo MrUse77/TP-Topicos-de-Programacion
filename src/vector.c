@@ -31,21 +31,25 @@ int inicializarVector(Vector* vec, void* elem)
     return EXITO;
 }
 
-/*A terminar*/
-int inicializarVectorDeArchivo(Vector* vec, FILE* arch, size_t archTam)
+/*A terminar, para despues*/
+int inicializarVectorDeArchivo(Vector* vec, const char* nomArch, size_t archTam)
 {
+    FILE* arch = fopen(nomArch, "rb");
+
+    if(!arch) return ERROR;
+
     return EXITO;
 }
 
-/*A terminar*/
+/*A terminar, para despues*/
 int grabarVectorEnArchivo(Vector* vec, FILE* arch, size_t archTam)
 {
     return EXITO;
 }
 
+/*
 void* pop(Vector* vec, void* elem, int pos)
 {
-    /*Agregar bounds checking*/
     
     if(pos < 0 || pos >= vec->cantElem) return NULL;
     
@@ -60,7 +64,7 @@ void* pop(Vector* vec, void* elem, int pos)
     return tmpRet;
 }
 
-/*A terminar*/
+A terminar
 int empujarEnVector(Vector* vec, void* elem)
 {
     size_t i;
@@ -81,15 +85,31 @@ int empujarEnVector(Vector* vec, void* elem)
     return EXITO;
 }
 
-/*A terminarr*/
+A terminar
 int apilarEnVector(Vector* vec, void* elem)
 {
-    if(_chequeoDeTamAux(elem, vec->tamElem)) return ERROR;
+    if(_boundsChecking(elem, vec->tamElem)) return ERROR;
 
 
 
 
     return EXITO;
+}
+*/
+void* pop(Vector* vec, void* elem, int pos)
+{
+    
+    if(pos < 0 || pos >= vec->cantElem) return NULL;
+    
+    char* tmpData = vec->data;
+    char* tmpElem = elem;
+    char* tmpRet;
+    
+    tmpData += pos * vec->tamElem;
+    memcpy(tmpRet, tmpData, vec->tamElem);
+    memcpy(tmpData, tmpElem, vec->tamElem);
+    
+    return tmpRet;
 }
 
 /*A terminar*/
@@ -107,18 +127,57 @@ int insertarEnVectorDsc(Vector* vec, void* elem, Cmp cmpFunc)
 /*A terminar*/
 int insertarEnVectorPos(Vector* vec, void* elem, int pos)
 {
+    if(_boundsChecking(vec->cantElem, pos)) return ERROR;
+
+    char* tmpData = vec->data;
+    char* tmpElem = elem;
+
+    tmpData += pos * vec->tamElem;
+
+    memcpy(tmpData, tmpElem, vec->tamElem);
+
+    vec->cantElem++;
+
     return EXITO;
 }
 
 /*A terminar*/
 int eliminarEnVector(Vector* vec, void* elem, Cmp cmpFunc)
 {
+
+
+
     return EXITO;
 }
 
 int eliminarEnVectorPos(Vector* vec, int pos)
 {
+    if(_boundsChecking(vec->cantElem, pos)) return ERROR;
+
+
+
     return EXITO;
+}
+
+int busquedaLinealEnVector(Vector* vec, void* elem, Cmp cmpFunc)
+{
+    int i = 0, pos = -1;
+    char* tmpElem = elem;
+    char* tmpData = vec->data;
+
+    while(pos == -1 && i < vec->cantElem){
+        if(cmpFunc(tmpData, tmpElem) == 0){
+            pos = i;
+        }
+        i++;
+    }
+
+    return pos;
+}
+
+int busquedaBinariaEnVector(Vector* vec, void* elem, Cmp cmpFunc)
+{
+    return 0;
 }
 
 void mostrarVector(Vector* vec, Imprimir imprFunc)
@@ -142,15 +201,13 @@ int destruirVector(Vector* vec)
     return EXITO;
 }
 
-int _chequeoDeTamAux(void* a, size_t tam)
+/*mas o menos*/
+int _boundsChecking(size_t bound, int pos)
 {
-    char* tmp = a;
-
-    if(sizeof(tmp) != tam) return ERROR;
-
-    return EXITO;
+    return (pos < 0 || pos >= bound) ? EXITO : ERROR;
 }
 
+/*No lo probe*/
 int _threshold(Vector* vec)
 {
     if(vec->cantElem == vec->cap){
@@ -162,6 +219,7 @@ int _threshold(Vector* vec)
     return EXITO;
 }
 
+/*No lo probe*/
 int _redimensionarVector(Vector* vec, int modif)
 {
     void* tmpData;
@@ -186,11 +244,3 @@ int _redimensionarVector(Vector* vec, int modif)
 
     return EXITO;
 }
-
-/*
-int _chequeDeCapAux(size_t cantElem, size_t cap)
-{
-    if(cantElem == cap) return LIMITE_DEL_VECTOR;
-
-    return EXITO;
-}*/
