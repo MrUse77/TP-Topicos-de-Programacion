@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "include/funciones.h"
 
 /* Esto podría ir como argumentos a main */
@@ -54,7 +53,7 @@ int main () {
         return cod;
 
     copiarString(dirArchivos, "archivos/", 254);
-    concatenarString(dirArchivos, NOMBRE_ARCH_INDICES_OBRA, 254),
+    concatenarString(dirArchivos, NOMBRE_ARCH_INDICES_OBRA, 254);
 
     cod = corregirArchivo(dirArchivos, formatearItemsObra);
 

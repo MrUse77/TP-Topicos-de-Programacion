@@ -1,5 +1,5 @@
 #include "../include/funciones.h"
-#include <string.h>
+#include "../include/strings.h"
 
 /* Prototipos internos */
 typedef int (*Cmp) (void* a, void* b);
@@ -15,9 +15,7 @@ char* agregarCampoEnCabecera (char* buffer, char* nombreCampo, Registro* reg, FI
 char* desencriptarItemsObra (char* str, const char* v_enc, const char* v_des);
 char* normalizarItemsObra (char* str);
 
-int compararString (const char* str1, const char* str2);
 void* buscarEnVector (const void* vec, size_t cantElem, size_t tamElem, void* elem, Cmp cmp);
-size_t longitudString (const char* str);
 
 int esLetra(char* c);
 char aMayus(char* c);
@@ -67,7 +65,7 @@ int generarArchivoAuxiliar (FILE* temp, FILE* orig, Formatear realizarFormateos)
     /* Obtiene la linea de la cabecera y añade el campo clasificador. */
     if (!agregarCampoEnCabecera(buffer, "Clasificador", &reg, temp, orig))
         return ERR_BUFFER_CORTO;
-    
+
     /* Obtiene la siguiente linea y verifica que esta posea el formato correcto. */
     fgets(buffer, BUFFER_TAM, orig);
 
@@ -330,7 +328,7 @@ int copiarArchivoTxt (char* nomArchDest, char* nomArchOrig) {
         fclose(orig);
         return ERR_ARCHIVO;
     }
-        
+
     char buffer[BUFFER_TAM];
     char* dirSaltoLinea;
     char aBuscar = '\n';
@@ -346,7 +344,7 @@ int copiarArchivoTxt (char* nomArchDest, char* nomArchOrig) {
         fprintf(dest, "%s", buffer);
         fgets(buffer, BUFFER_TAM, orig);
     }
-        
+
     fclose(orig);
     fclose(dest);
 
@@ -367,62 +365,6 @@ void* buscarEnVector (const void* vec, size_t cantElem, size_t tamElem, void* el
     return NULL;
 }
 
-int compararString (const char* str1, const char* str2) {
-
-    size_t longStr1 = longitudString(str1);
-    size_t longStr2 = longitudString(str2);
-
-    if (longStr1 != longStr2)
-        return longStr1 - longStr2;
-
-    const char* letraActualStr1 = str1;
-    const char* letraActualStr2 = str2;
-
-    while (*letraActualStr1 != '\0' && *letraActualStr1 - *letraActualStr2 == 0) {
-        letraActualStr1++;
-        letraActualStr2++;
-    }
-
-    return *letraActualStr1 - *letraActualStr2;
-}
-
-char* copiarString (char* dest, const char* orig, size_t lim) {
-
-    const char* letraActualOrig = orig;
-    char* letraActualDest = dest;
-
-    while ((letraActualDest - dest) < lim && *letraActualOrig != '\0') {
-
-        *letraActualDest = *letraActualOrig;
-
-        letraActualOrig++;
-        letraActualDest++;
-    }
-
-    *letraActualDest = '\0';
-
-    return dest;
-}
-
-char* concatenarString (char* str1, const char* str2, size_t lim) {
-
-    size_t longStr1 = longitudString(str1);
-
-    const char* letraActualStr2 = str2;
-    char* letraActualStr1 = str1 + longStr1;
-
-    while ((letraActualStr1 - str1) < lim && *letraActualStr2 != '\0') {
-        *letraActualStr1 = *letraActualStr2;
-
-        letraActualStr2++;
-        letraActualStr1++;
-    }
-
-    *letraActualStr1 = '\0';
-
-    return str1;
-}
-
 /* ------------------------------------------------ Auxiliares ------------------------------------------------ */
 
 /*Funcion auxiliar, para saber si un char es letra, igual que isalpha form ctype.h*/
@@ -438,15 +380,6 @@ char aMayus (char* c)
     char aux = *c;
     aux -= 32;
     return aux;
-}
-
-size_t longitudString (const char* str) {
-    char* strP = (char*) str;
-
-    while (*strP != '\0')
-        strP++;
-
-    return strP - str;
 }
 
 /*

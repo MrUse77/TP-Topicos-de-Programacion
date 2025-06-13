@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <strings.h> /* Nuestra bibioteca de strings (termina en s). */
 
 /* Nombres de archivos */
 #define NOMBRE_ARCH_AUXILIAR "auxiliar.tmp"
@@ -21,7 +22,7 @@
 
 #define PERIODO_TAM 11
 /* Algunos valores en nivel_general_aperturas de indices_items_obras.csv poseen hasta 40 caracteres */
-#define NIVEL_TAM 41 
+#define NIVEL_TAM 41
 #define INDICE_TAM 17
 #define CLASIFICADOR_TAM 14
 
@@ -43,8 +44,5 @@ int copiarArchivoTxt (char* nomArchDest, char* nomArchOrig);
 int corregirArchivo (char* nomArchOrig, Formatear realizarFormateos);
 void formatearNivelGeneral (Registro* reg);
 void formatearItemsObra (Registro* reg);
-
-char* concatenarString (char* str1, const char* str2, size_t lim);
-char* copiarString (char* dest, const char* orig, size_t lim);
 
 #endif

@@ -14,3 +14,26 @@
 	"../include/funciones.h"
 	<string.h>
 
+1749852508 source:c:\users\estudiante\desktop\facultad\tp-topicos-de-programacion\src\funciones.c
+	"../include/funciones.h"
+	"../include/strings.h"
+
+1749852398 c:\users\estudiante\desktop\facultad\tp-topicos-de-programacion\include\funciones.h
+	<stdio.h>
+	<stdlib.h>
+	<stddef.h>
+	<strings.h>
+
+1749852613 c:\users\estudiante\desktop\facultad\tp-topicos-de-programacion\include\strings.h
+	<stddef.h>
+
+1749853026 source:c:\users\estudiante\desktop\facultad\tp-topicos-de-programacion\main.c
+	<stdio.h>
+	<stdlib.h>
+	"include/funciones.h"
+	"include/strings.h"
+
+1749852647 source:c:\users\estudiante\desktop\facultad\tp-topicos-de-programacion\src\strings.c
+	<string.h>
+	"../include/strings.h"
+
