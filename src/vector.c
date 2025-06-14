@@ -2,184 +2,113 @@
 #include <stdlib.h>
 #include <string.h>
 
-Vector* crearVector(Vector* vec, size_t cantInicial, size_t tamElem)
+/*hecho*/
+Vector* crearVector(size_t tamElem)
 {
-    vec->data = malloc(tamElem * cantInicial);
+    Vector* vec = malloc(sizeof(Vector));
+
+    if(!vec) return NULL;
+
+    vec->data = malloc(tamElem * DEFAULT_CAP);
 
     if(!(vec->data)) return NULL;
 
-    vec->cantElem = cantInicial;
+    vec->cursor = 0;
+    vec->cantElem = 0;
     vec->tamElem = tamElem;
-    vec->cap = (cantInicial > vec->cap) ? cantInicial : MINIMUM_CAP;
+    vec->cap = DEFAULT_CAP;
 
     return vec;
 }
 
-int inicializarVector(Vector* vec, void* elem)
-{
-    size_t i, tamElem = vec->tamElem;
-    char* tmpVec = vec->data;
-    char* tmpElem = elem;
-
-    /*if(_chequeoDeTamAux(elem, tamElem)) return ERROR;*/
-
-    for(i = 0; i < vec->cantElem; i++){
-        memcpy(tmpVec, tmpElem, tamElem);
-        tmpVec += tamElem;
-    }
-
-    return EXITO;
-}
-
 /*A terminar, para despues*/
-int inicializarVectorDeArchivo(Vector* vec, const char* nomArch, size_t archTam)
+int inicializarVectorDeArchivoTexto(Vector* vec, const char* nomArch)
 {
-    FILE* arch = fopen(nomArch, "rb");
+    FILE* arch = fopen(nomArch, "rt");
 
     if(!arch) return ERROR;
 
+    char* buffer = malloc(vec->tamElem);
+
+    fgets(buffer, vec->tamElem, arch);
+    
+    while(!feof(arch)){
+        insertarArribaEnVector(vec, buffer);
+        fgets(buffer, vec->tamElem, arch);
+    }
+
+    fclose(arch);
+    free(buffer);
+
     return EXITO;
 }
 
 /*A terminar, para despues*/
-int grabarVectorEnArchivo(Vector* vec, FILE* arch, size_t archTam)
+int grabarVectorEnArchivoBinario(Vector* vec, const char* nomArch)
 {
+    FILE* arch = fopen(nomArch, "wb");
+
+    if(!arch) return ERR_FILE;
+
+    fwrite(vec->data, vec->tamElem, vec->cantElem, arch);
+
+    fclose(arch);
+
     return EXITO;
 }
 
-/*
-void* pop(Vector* vec, void* elem, int pos)
+
+int insertarArribaEnVector(Vector* vec, void* elem)
 {
-    
-    if(pos < 0 || pos >= vec->cantElem) return NULL;
-    
-    char* tmpData = vec->data;
-    char* tmpElem = elem;
-    char* tmpRet;
-    
-    tmpData += pos * vec->tamElem;
-    memcpy(tmpRet, tmpData, vec->tamElem);
-    memcpy(tmpData, tmpElem, vec->tamElem);
-    
-    return tmpRet;
-}
-
-A terminar
-int empujarEnVector(Vector* vec, void* elem)
-{
-    size_t i;
-    char* tmpData = vec->data;
-    char* tmpElem = elem;
-    char* tmpAux;
-    
-    _threshold(vec);
-    
-//    memcpy(vec->data, tmpElem, vec->tamElem);
-  
-    tmpAux = pop(vec, tmpElem, 0);
-    
-    for(i = 1; i < vec->cantElem; i++){
-        tmpAux = pop(vec, tmpAux, i);
-    }
-    
-    return EXITO;
-}
-
-A terminar
-int apilarEnVector(Vector* vec, void* elem)
-{
-    if(_boundsChecking(elem, vec->tamElem)) return ERROR;
-
-
-
-
-    return EXITO;
-}
-*/
-void* pop(Vector* vec, void* elem, int pos)
-{
-    
-    if(pos < 0 || pos >= vec->cantElem) return NULL;
-    
-    char* tmpData = vec->data;
-    char* tmpElem = elem;
-    char* tmpRet;
-    
-    tmpData += pos * vec->tamElem;
-    memcpy(tmpRet, tmpData, vec->tamElem);
-    memcpy(tmpData, tmpElem, vec->tamElem);
-    
-    return tmpRet;
-}
-
-/*A terminar*/
-int insertarEnVectorAsc(Vector* vec, void* elem, Cmp cmpFunc)
-{
-    return EXITO;
-}
-
-/*A terminar*/
-int insertarEnVectorDsc(Vector* vec, void* elem, Cmp cmpFunc)
-{
-    return EXITO;
-}
-
-/*A terminar*/
-int insertarEnVectorPos(Vector* vec, void* elem, int pos)
-{
-    if(_boundsChecking(vec->cantElem, pos)) return ERROR;
-
-    char* tmpData = vec->data;
-    char* tmpElem = elem;
-
-    tmpData += pos * vec->tamElem;
-
-    memcpy(tmpData, tmpElem, vec->tamElem);
-
     vec->cantElem++;
 
-    return EXITO;
-}
+    if(_threshold(vec)) return ERROR;
 
-/*A terminar*/
-int eliminarEnVector(Vector* vec, void* elem, Cmp cmpFunc)
-{
-
-
-
-    return EXITO;
-}
-
-int eliminarEnVectorPos(Vector* vec, int pos)
-{
-    if(_boundsChecking(vec->cantElem, pos)) return ERROR;
-
-
-
-    return EXITO;
-}
-
-int busquedaLinealEnVector(Vector* vec, void* elem, Cmp cmpFunc)
-{
-    int i = 0, pos = -1;
-    char* tmpElem = elem;
     char* tmpData = vec->data;
+    char* tmpElem = elem;
 
-    while(pos == -1 && i < vec->cantElem){
-        if(cmpFunc(tmpData, tmpElem) == 0){
-            pos = i;
+    tmpData += vec->cantElem * vec->tamElem;
+
+    memcpy(tmpData, tmpElem, vec->tamElem);
+
+    return EXITO;
+}
+
+
+int ordenarVector(Vector* vec, Cmp cmpFunc)
+{
+    size_t tamElem = vec->tamElem;
+
+    char* tmpI = NULL;
+    char* tmpJ = NULL;
+    char* tmpUlt = vec->data + vec->cantElem * vec->tamElem;
+
+    for(tmpI = vec->data; tmpI < tmpUlt - tamElem; tmpI += tamElem){
+        for(tmpJ = vec->data; tmpJ < tmpUlt - tamElem - tmpI; tmpJ += tamElem){
+            if(cmpFunc(tmpJ, tmpJ + tamElem) < 0){
+                intercambiar(tmpJ, tmpJ + tamElem, tamElem);
+            }
         }
-        i++;
     }
 
-    return pos;
+    return EXITO;
 }
 
-int busquedaBinariaEnVector(Vector* vec, void* elem, Cmp cmpFunc)
+
+int intercambiar(void* a, void* b, size_t tamElem)
 {
-    return 0;
+    char* tmp = malloc(tamElem);
+
+    memcpy(tmp, a, tamElem);
+    memcpy(a, b, tamElem);
+    memcpy(b, tmp, tamElem);
+
+    free(tmp);
+
+    return EXITO;
 }
 
+/*hecho*/
 void mostrarVector(Vector* vec, Imprimir imprFunc)
 {
     size_t i;
@@ -190,13 +119,12 @@ void mostrarVector(Vector* vec, Imprimir imprFunc)
     }
 }
 
+/*hecho*/
 int destruirVector(Vector* vec)
 {
     free(vec->data);
 
-    vec->tamElem = 0;
-    vec->cantElem = 0;
-    vec->cap = 0;
+    free(vec);
 
     return EXITO;
 }
@@ -210,7 +138,7 @@ int _boundsChecking(size_t bound, int pos)
 /*No lo probe*/
 int _threshold(Vector* vec)
 {
-    if(vec->cantElem == vec->cap){
+    if(vec->cantElem/ vec->cap >= MAX_THRESHOLD){
         _redimensionarVector(vec, INCREMENTO);
     }else if(vec->cantElem / vec->cap <= MIN_THRESHOLD){
         _redimensionarVector(vec, DECREMENTO);
@@ -222,8 +150,8 @@ int _threshold(Vector* vec)
 /*No lo probe*/
 int _redimensionarVector(Vector* vec, int modif)
 {
-    void* tmpData;
-    size_t tmpCap;
+    void* tmpData = NULL;
+    size_t tmpCap = 0;
 
     switch(modif){
 
