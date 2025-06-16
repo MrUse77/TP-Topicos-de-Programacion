@@ -1,0 +1,56 @@
+# depslib dependency file v1.0
+1750080255 source:c:\users\boree\onedrive\escritorio\yo\topicos de programacion\boceto tp\tdavector.c
+	"TDAvector.h"
+	<stdbool.h>
+
+1750082793 c:\users\boree\onedrive\escritorio\yo\topicos de programacion\boceto tp\tdavector.h
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<stdbool.h>
+
+1750099219 source:c:\users\boree\onedrive\escritorio\yo\topicos de programacion\boceto tp\funciones.c
+	"TDAvector.h"
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	"funciones.h"
+	"TDAPalabra.h"
+	"SecuenciaPalabra.h"
+	"normalizar.h"
+
+1750097538 c:\users\boree\onedrive\escritorio\yo\topicos de programacion\boceto tp\funciones.h
+
+1750099230 source:c:\users\boree\onedrive\escritorio\yo\topicos de programacion\boceto tp\main.c
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<locale.h>
+	"TDAvector.h"
+	"funciones.h"
+
+1749942110 source:c:\users\boree\onedrive\escritorio\yo\topicos de programacion\boceto tp\normalizar.c
+	"TDAPalabra.h"
+	"SecuenciaPalabra.h"
+	"normalizar.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1749923773 source:c:\users\boree\onedrive\escritorio\yo\topicos de programacion\boceto tp\tdapalabra.c
+	<stdio.h>
+	<ctype.h>
+	"TDAPalabra.h"
+
+1749924037 c:\users\boree\onedrive\escritorio\yo\topicos de programacion\boceto tp\tdapalabra.h
+	<stdbool.h>
+
+1749908330 source:c:\users\boree\onedrive\escritorio\yo\topicos de programacion\boceto tp\secuenciapalabra.c
+	"SecuenciaPalabra.h"
+
+1749908336 c:\users\boree\onedrive\escritorio\yo\topicos de programacion\boceto tp\secuenciapalabra.h
+	<stdbool.h>
+	"TDAPalabra.h"
+
+1749941238 c:\users\boree\onedrive\escritorio\yo\topicos de programacion\boceto tp\normalizar.h
+
