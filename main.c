@@ -24,28 +24,27 @@ int main()
 
     DesencriptarGeneral(&general);
     DesencriptarItems(&items);
+    
     normalizar_general(&general);
+    
     formatoPeriodo(&items,eligeItems);
     formatoPeriodo(&general,eligeGeneral);
     normalizarItems(&items);
+    
     clasificadorGeneral(&general);
     clasificadorItems(&items);
-    //mostrarVector(&items);
-   // mostrarVectorGeneral(&general);
+    
     unificar3(&unif,&items,&general);
-
-    //unificar(&items,&general);
-    //ordenarInsercion(&items,cmpClasificador);
-    //ordenarInsercion(&items,cmpPeriodo);
 
     ordenarInsercion(&unif,cmpClasificador);
     ordenarInsercion(&unif,cmpPeriodo);
+    
     varMensual(&unif);
     varAnual(&unif);
     unificarResult(&unif,NOMBRE_BIN);
-    //mostrarResultsBin(NOMBRE_BIN);
-   // mostrarVectorItes(&items);
-    //mostrarVectorUnif(&unif);
+    
+    mostrarResultsBin(NOMBRE_BIN);
+ 
 
     return 0;
 }
