@@ -28,9 +28,9 @@ int archivoAVector(const char* nombreArchivo, Vector *v, leerLinea leer, int tam
     char linea[tamLinea];
     //setlocale(LC_ALL, "Spanish"); // Para poder leer floats con coma
     fgets(linea, tamLinea, pf);
-    while(fgets(linea, tamLinea, pf)) // Mientras haya un renglÛn que leer...
+    while(fgets(linea, tamLinea, pf)) // Mientras haya un rengl√≥n que leer...
     {
-        leer(linea, posActual); // Cargo campo por campo cada lÌnea en el vector de estructura
+        leer(linea, posActual); // Cargo campo por campo cada l√≠nea en el vector de estructura
         v->ce ++;
 
         if(v->ce == v->capacidad)  // Nos fijamos si la cantidad de elementos del vector es igual a la capacidad, para aumentarla
@@ -45,15 +45,15 @@ int archivoAVector(const char* nombreArchivo, Vector *v, leerLinea leer, int tam
         posActual += v->tamElem;
     }
 
-    // Una vez cargamos todo en el vector, redimensionamos para que el archivo no ocupe memoria de m·s solo si hay mucha diferencia,
+    // Una vez cargamos todo en el vector, redimensionamos para que el archivo no ocupe memoria de m√°s solo si hay mucha diferencia,
     // para evitar hacer un realloc no muy necesario si no hay tanta diferencia entre la cantidad y la capacidad.
-    // En este caso lo convertimos al mismo tamaÒo de elementos que tiene el vector ya que no vamos a cargar m·s que esos
+    // En este caso lo convertimos al mismo tama√±o de elementos que tiene el vector ya que no vamos a cargar m√°s que esos
     if(v->ce < v->capacidad/1.5)
     {
         vectorRedimensionar(v, v->ce);
     }
 
-    // IMPORTANTE no olvidar liberar la memoria din·mica al final del programa
+    // IMPORTANTE no olvidar liberar la memoria din√°mica al final del programa
 
     fclose(pf);
     return OK;
@@ -84,17 +84,17 @@ void normalizarItems(Vector *v)
         normalizar(pal->nivel_general,p);
     }
 }
-void leerLineaItems(const char* linea, void* pos) // No est· en el .h para que el usuario no pueda llamar a la funciÛn
+void leerLineaItems(const char* linea, void* pos) // No est√° en el .h para que el usuario no pueda llamar a la funci√≥n
 {
 
-    char* punteroLinea = strrchr(linea,';'); // Posicionamos el puntero justo antes del ˙ltimo campo del texto
+    char* punteroLinea = strrchr(linea,';'); // Posicionamos el puntero justo antes del √∫ltimo campo del texto
     ITEMS* actual = (ITEMS*) pos;
 
     // Indice
-    *punteroLinea = '\0'; // Nos aseguramos de que no haya ninguna basura despuÈs
+    *punteroLinea = '\0'; // Nos aseguramos de que no haya ninguna basura despu√©s
     punteroLinea++;
     reemplazar_coma(punteroLinea);
-    actual->indice = atof(punteroLinea); // tras testearlo, atoi/atof es un poco m·s r·pido que el sscanf
+    actual->indice = atof(punteroLinea); // tras testearlo, atoi/atof es un poco m√°s r√°pido que el sscanf
 
     // Nivel_general
     punteroLinea = strrchr(linea,';');
@@ -111,17 +111,17 @@ void leerLineaItems(const char* linea, void* pos) // No est· en el .h para que e
 
 }
 
-void leerLineaGeneral(const char* linea, void* pos) // No est· en el .h para que el usuario no pueda llamar a la funciÛn
+void leerLineaGeneral(const char* linea, void* pos) // No est√° en el .h para que el usuario no pueda llamar a la funci√≥n
 {
 
-    char* punteroLinea = strrchr(linea,';'); // Posicionamos el puntero justo antes del ˙ltimo campo del texto
+    char* punteroLinea = strrchr(linea,';'); // Posicionamos el puntero justo antes del √∫ltimo campo del texto
     GENERAL* actual = (GENERAL*) pos;
 
     // Indice
-    *punteroLinea = '\0'; // Nos aseguramos de que no haya ninguna basura despuÈs
+    *punteroLinea = '\0'; // Nos aseguramos de que no haya ninguna basura despu√©s
     punteroLinea++;
     reemplazar_coma(punteroLinea);
-    actual->indice = atof(punteroLinea); // tras testearlo, atoi/atof es un poco m·s r·pido que el sscanf
+    actual->indice = atof(punteroLinea); // tras testearlo, atoi/atof es un poco m√°s r√°pido que el sscanf
 
     // Nivel_general
     punteroLinea = strrchr(linea,';');
@@ -305,7 +305,7 @@ void llenarCampo(char *clas, int valor)
 {
     if(valor)
     {
-        strcpy(clas, "CapÌtulos");
+        strcpy(clas, "Cap√≠tulos");
     }else
     {
         strcpy(clas, "Nivel general");
@@ -319,7 +319,7 @@ void clasificadorItems(Vector *v)
     for(void *i = ini; i <= ult; i += v->tamElem)
     {
         ITEMS *c = (ITEMS*)i;
-        strcpy(c->clasificador,"Õtems");
+        strcpy(c->clasificador,"√çtems");
     }
 }
 
@@ -406,59 +406,6 @@ int unificar3(Vector *unif, Vector *v1, Vector *v2)
     return OK;
 }
 
-/*
-int unificarResult(Vector *unif, const char* nombreArchivo)
-{
-    FILE *pf = fopen(nombreArchivo,"wb");
-    if(!pf)
-    {
-        return ERROR_ARCH;
-    }
-    size_t cantidad = unif->ce*3;
-
-    RESULT *result = malloc(cantidad*sizeof(RESULT));
-    void *iniu = unif->vec;
-    void *ultu = unif->vec + (unif->ce-1)*unif->tamElem;
-    //indice_icc
-    for(void *i = iniu; i <= ultu; i += unif->tamElem)
-    {
-        UNIF *pos = (UNIF*)i;
-        strcpy(result->periodo, pos->periodo);
-        strcpy(result->clasificador,pos->clasificador);
-        strcpy(result->general_aperturas,pos->general_aperturas);
-        strcpy(result->tipo_varible,"indice_icc");
-        sprintf(result->valor,"%.7f",pos->indice);
-        result++;
-
-    }
-    //var mensual
-    for(void *i = iniu; i <= ultu; i += unif->tamElem)
-    {
-        UNIF *pos = (UNIF*)i;
-        strcpy(result->periodo, pos->periodo);
-        strcpy(result->clasificador,pos->clasificador);
-        strcpy(result->general_aperturas,pos->general_aperturas);
-        strcpy(result->tipo_varible,"var_mensual");
-        strcpy(result->valor,pos->var_mensual);
-        result++;
-
-    }
-
-    for(void *i = iniu; i <= ultu; i += unif->tamElem)
-    {
-        UNIF *pos = (UNIF*)i;
-        strcpy(result->periodo, pos->periodo);
-        strcpy(result->clasificador,pos->clasificador);
-        strcpy(result->general_aperturas,pos->general_aperturas);
-        strcpy(result->tipo_varible,"var_interanual");
-        strcpy(result->valor,pos->var_interanual);
-        result++;
-
-    }
-    return OK;
-
-}*/
-
 int unificarResult(Vector *unif, const char* nombreArchivo)
 {
     FILE *pf = fopen(nombreArchivo,"wb");
@@ -530,7 +477,7 @@ void mostrarResultsBin(const char *nombreArchivo) {
     size_t leidos;
 
 
-    // Leer un RESULT cada iteraciÛn
+    // Leer un RESULT cada iteraci√≥n
     while ((leidos = fread(&reg, sizeof(RESULT), 1, pf)) == 1) {
         printf("%-15s | %-15s | %-40s | %-20s | %-30s\n",
                reg.periodo,
@@ -627,7 +574,7 @@ int prioridad(const void *e1)
     if(strcmp(p1->clasificador,"Nivel general") == 0)
     {
         return 0;
-    }else if(strcmp(p1->clasificador,"CapÌtulos") == 0)
+    }else if(strcmp(p1->clasificador,"Cap√≠tulos") == 0)
     {
         return 1;
     }else
