@@ -27,18 +27,16 @@ int main()
     DesencriptarGeneral(&general);
     DesencriptarItems(&items);
     normalizar_general(&general);
+    
     formatoPeriodo(&items,eligeItems);
     formatoPeriodo(&general,eligeGeneral);
+    
     normalizarItems(&items);
+    
     clasificadorGeneral(&general);
     clasificadorItems(&items);
-    //mostrarVector(&items);
-   // mostrarVectorGeneral(&general);
+    
     unificar(&unif,&general,&items);
-
-    //unificar(&items,&general);
-    //ordenarInsercion(&items,cmpClasificador);
-    //ordenarInsercion(&items,cmpPeriodo);
 
     ordenarInsercion(&unif,cmpClasificador);
     ordenarInsercion(&unif,cmpPeriodo);
@@ -50,8 +48,7 @@ int main()
     vectorEliminar(&items);
     vectorEliminar(&general);
     vectorEliminar(&unif);
-   // mostrarVectorItes(&items);
-    //mostrarVectorUnif(&unif);
+
 
     return 0;
 }
