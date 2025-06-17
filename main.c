@@ -1,7 +1,6 @@
 #include "include/vector.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "include/funciones.h"
 
 /* Esto podría ir como argumentos a main */

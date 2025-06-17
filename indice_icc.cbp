@@ -32,7 +32,19 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-    <Unit filename="src/main.c">
+		<Unit filename="include/funciones.h" />
+		<Unit filename="include/strings.h" />
+		<Unit filename="include/vector.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/funciones.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/strings.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/vector.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>

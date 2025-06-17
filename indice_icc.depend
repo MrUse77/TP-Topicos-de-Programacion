@@ -14,6 +14,9 @@
 	"../include/funciones.h"
 	<string.h>
 
+1749852508 source:c:\users\estudiante\desktop\facultad\tp-topicos-de-programacion\src\funciones.c
+	"../include/funciones.h"
+	"../include/strings.h"
 
 1749852398 c:\users\estudiante\desktop\facultad\tp-topicos-de-programacion\include\funciones.h
 	<stdio.h>
@@ -69,4 +72,40 @@
 	"../include/strings.h"
 	<stdio.h>
 	<stdlib.h>
+
+1750095783 source:/home/agustin/Documentos/unlam/Topicos/tp-bak/main.c
+	"include/vector.h"
+	<stdio.h>
+	<stdlib.h>
+	"include/funciones.h"
+
+1750078986 /home/agustin/Documentos/unlam/Topicos/tp-bak/include/vector.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1750095593 /home/agustin/Documentos/unlam/Topicos/tp-bak/include/funciones.h
+	<stdio.h>
+	<stdlib.h>
+	<stddef.h>
+	"strings.h"
+	"vector.h"
+
+1750086235 /home/agustin/Documentos/unlam/Topicos/tp-bak/include/strings.h
+	<stddef.h>
+
+1750095947 source:/home/agustin/Documentos/unlam/Topicos/tp-bak/src/funciones.c
+	"../include/funciones.h"
+	"../include/strings.h"
+	<stdio.h>
+	<stdlib.h>
+
+1750095516 source:/home/agustin/Documentos/unlam/Topicos/tp-bak/src/strings.c
+	<string.h>
+	"../include/strings.h"
+	"../include/funciones.h"
+	<stdio.h>
+
+1750082127 source:/home/agustin/Documentos/unlam/Topicos/tp-bak/src/vector.c
+	"../include/vector.h"
 
