@@ -333,7 +333,7 @@ int vectorRecorrer(Vector *vec, Accion actFunc)
 }
 
 /*Probado*/
-int mostrarVector(Vector *vec, Imprimir imprFunc)
+int vectorMostrar(Vector *vec, Imprimir imprFunc)
 {
 	if (vec->cantElem == 0)
 		return ERROR;

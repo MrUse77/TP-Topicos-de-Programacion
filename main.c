@@ -60,7 +60,7 @@ int main()
 		destruirVector(&v);
 		return cod;
 	}
-	/*mostrarVector(&v, imprimirReg);*/
+	/*vectorMostrar(&v, imprimirReg);*/
 
 	copiarString(dirArchivos, "archivos/", 254);
 	concatenarString(dirArchivos, NOMBRE_ARCH_INDICES_OBRA, 254);
