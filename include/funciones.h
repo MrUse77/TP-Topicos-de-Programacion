@@ -53,5 +53,6 @@ int unirRegistros(Vector *v1, Vector *v2, Vector *vBin);
 void formatearNivelGeneral(Registro *reg);
 void formatearItemsObra(Registro *reg);
 void ordenarRegistros(Vector *vBin);
+void crearYescribirArchivoBinario(Vector *vBin, const char *path);
 
 #endif
