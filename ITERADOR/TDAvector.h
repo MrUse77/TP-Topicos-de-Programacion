@@ -54,8 +54,10 @@ typedef int (*Cmp)(const void *e1, const void *e2);
 bool vectorRedimensionar(Vector* v, size_t capacidad);
 bool vectorCrear(Vector* v, size_t capacidad, size_t tamElem);
 int vectorInsertarEnPos(Vector* v, int elem, int pos);
-int vectorInsertarFinal(Vector* v, const void* elem);
+bool vectorInsertarFinal(Vector* v, const void* elem);
 int ordenarInsercion(Vector *v, Cmp cmp);
 void vectorEliminar(Vector* v);
+size_t vectorTamElem(Vector *v);
+int vectorCantidadElementos(Vector *v);
 
 #endif // TDAVECTOR_H_INCLUDED
