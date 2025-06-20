@@ -41,14 +41,20 @@ void intercambiar(void* a, void* b, size_t tamElem)
     free(aTemp);
 }
 
-int vectorInsertarFinal(Vector* v, const void* elem)
+bool vectorInsertarFinal(Vector* v, const void* elem)
 {
     if(v->ce == v->capacidad)
-        vectorRedimensionar(v, v->capacidad * FACTOR_INCR);
+    {
+        if(!vectorRedimensionar(v, v->capacidad * FACTOR_INCR))
+        {
+            return false;
+        }
+    }
+
 
     memcpy(v->vec + v->ce*(v->tamElem), elem, v->tamElem);
     (v->ce)++;
-    return OK;
+    return true;
 }
 
 int ordenarInsercion(Vector *v, Cmp cmp)
@@ -62,9 +68,9 @@ int ordenarInsercion(Vector *v, Cmp cmp)
 
     for (i = v->vec + v->tamElem; i < ult; i += v->tamElem)
     {
-        memmove(aux,i,v->tamElem); // Guarda el elemento aux en posición i
+        memmove(aux,i,v->tamElem); // Guarda el elemento aux en posiciÃ³n i
         j = i - v->tamElem;
-        while (j >= v->vec && cmp(aux,j)<0) // Vamos recorriendo desde i para la izquierda y viendo cuándo un elemento es <= aux
+        while (j >= v->vec && cmp(aux,j)<0) // Vamos recorriendo desde i para la izquierda y viendo cuÃ¡ndo un elemento es <= aux
         {
             memmove(j+v->tamElem, j, v->tamElem); // Mientras un elemento no sea <= aux, los vamos moviendo a la derecha
             j -= v->tamElem;
@@ -82,6 +88,16 @@ void vectorEliminar(Vector* v)
     v->vec = NULL;
     v->ce = 0;
     v->capacidad = 0;
+}
+
+size_t vectorTamElem(Vector *v)
+{
+    return v->tamElem;
+}
+
+int vectorCantidadElementos(Vector *v)
+{
+    return v->ce;
 }
 
 
