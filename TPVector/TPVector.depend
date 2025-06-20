@@ -1,0 +1,49 @@
+# depslib dependency file v1.0
+1750119766 source:e:\programacion\c\materias-programacion\tp\tpvector\vector.c
+	"Vector.h"
+	"../TPString/string.h"
+	<stdlib.h>
+	<string.h>
+	<stdio.h>
+
+1750118806 e:\programacion\c\materias-programacion\tp\tpvector\vector.h
+	<stddef.h>
+	"../TPComun/TPComun.h"
+
+1750045236 e:\programacion\c\materias-programacion\tp\tpcomun\tpcomun.h
+
+1750180829 e:\programacion\c\materias-programacion\tp\tpstring\string.h
+	<stddef.h>
+
+1750437346 source:e:\programacion\c\materias-programacion\tp\practicatp\tpvector\vector.c
+	"Vector.h"
+	"../TPString/string.h"
+	<stdlib.h>
+	<string.h>
+	<stdio.h>
+
+1750430376 e:\programacion\c\materias-programacion\tp\practicatp\tpvector\vector.h
+	<stddef.h>
+	"../TPComun/TPComun.h"
+
+1750045236 e:\programacion\c\materias-programacion\tp\practicatp\tpcomun\tpcomun.h
+
+1750180829 e:\programacion\c\materias-programacion\tp\practicatp\tpstring\string.h
+	<stddef.h>
+
+1750437346 source:e:\programacion\c\tpluis\tp-topicos-de-programacion\tpvector\vector.c
+	"Vector.h"
+	"../TPString/string.h"
+	<stdlib.h>
+	<string.h>
+	<stdio.h>
+
+1750430376 e:\programacion\c\tpluis\tp-topicos-de-programacion\tpvector\vector.h
+	<stddef.h>
+	"../TPComun/TPComun.h"
+
+1750045236 e:\programacion\c\tpluis\tp-topicos-de-programacion\tpcomun\tpcomun.h
+
+1750180829 e:\programacion\c\tpluis\tp-topicos-de-programacion\tpstring\string.h
+	<stddef.h>
+

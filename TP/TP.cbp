@@ -2,22 +2,27 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="indice_icc" />
+		<Option title="TP" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/indice_icc" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/TP" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="../TP/archivos/indices_icc_general_capitulos.csv ../TP/archivos/Indices_items_obra.csv archivos/indices_unificado.dat" />
 				<Compiler>
 					<Add option="-g" />
-					<Add option="-std=c89" />
+					<Add option="-ansi -Wall -Werror -pedantic -std=c89" />
 				</Compiler>
+				<Linker>
+					<Add library="../TPVector/bin/Debug/libTPVector.a" />
+					<Add library="../TPString/bin/Debug/libTPString.a" />
+				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/indice_icc" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/TP" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -32,19 +37,11 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="include/funciones.h" />
-		<Unit filename="include/strings.h" />
-		<Unit filename="include/vector.h" />
+		<Unit filename="funciones.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="funciones.h" />
 		<Unit filename="main.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/funciones.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/strings.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/vector.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>
