@@ -544,7 +544,9 @@ void varMensual(Vector *v)
 int cantidad_indices(Vector *v)
 {
 
-    void *pos = v->vec;
+    VectorIterador it;
+    vectorIteradorCrear(&it,v);
+    void *pos = vectorIteradorPrimero(&it);
     int cantidad = 0;
     char primero[41];
     UNIF *gen = (UNIF*)pos;
@@ -554,7 +556,7 @@ int cantidad_indices(Vector *v)
     do
     {
         cantidad++;
-        pos += v->tamElem;
+        pos = vectorIteradorSiguiente(&it);
         gen = (UNIF*)pos;
 
 
