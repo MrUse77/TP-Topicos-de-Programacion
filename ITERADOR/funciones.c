@@ -26,7 +26,12 @@ int archivoAVector(const char* nombreArchivo, Vector *v, leerLinea leer, int tam
         return ERROR_ARCH;
     }
 
-    char linea[tamLinea];
+    char *linea = malloc(tamLinea);
+    if(!linea)
+    {
+        fclose(pf);
+        return ERROR_REALLOC;
+    }
 
     fgets(linea, tamLinea, pf);
     void *buffer = malloc(vectorTamElem(v));
@@ -47,6 +52,7 @@ int archivoAVector(const char* nombreArchivo, Vector *v, leerLinea leer, int tam
         }
     }
     free(buffer);
+    free(linea);
     // Una vez cargamos todo en el vector, redimensionamos para que el archivo no ocupe memoria de más solo si hay mucha diferencia,
     // para evitar hacer un realloc no muy necesario si no hay tanta diferencia entre la cantidad y la capacidad.
     // En este caso lo convertimos al mismo tamaño de elementos que tiene el vector ya que no vamos a cargar más que esos
