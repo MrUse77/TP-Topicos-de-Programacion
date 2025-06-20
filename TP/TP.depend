@@ -75,3 +75,28 @@
 	"./funciones.h"
 	"../TPString/string.h"
 
+1750443875 source:c:\users\lenovo\onedrive\documentos\github\tp-topicos-de-programacion\tp\funciones.c
+	"./funciones.h"
+	"../TPString/string.h"
+	<string.h>
+	<stdio.h>
+	<stdlib.h>
+
+1750443875 c:\users\lenovo\onedrive\documentos\github\tp-topicos-de-programacion\tp\funciones.h
+	"../TPVector/Vector.h"
+
+1750443875 c:\users\lenovo\onedrive\documentos\github\tp-topicos-de-programacion\tpvector\vector.h
+	<stddef.h>
+	"../TPComun/TPComun.h"
+
+1750443875 c:\users\lenovo\onedrive\documentos\github\tp-topicos-de-programacion\tpcomun\tpcomun.h
+
+1750443875 c:\users\lenovo\onedrive\documentos\github\tp-topicos-de-programacion\tpstring\string.h
+	<stddef.h>
+
+1750443875 source:c:\users\lenovo\onedrive\documentos\github\tp-topicos-de-programacion\tp\main.c
+	<stdio.h>
+	<stdlib.h>
+	"./funciones.h"
+	"../TPString/string.h"
+
