@@ -19,58 +19,59 @@
 int archivoAVector(const char* nombreArchivo, Vector *v, leerLinea leer, int tamLinea)
 {
     FILE *pf = fopen(nombreArchivo, "rt");
+
     if(pf == NULL)
     {
         printf("Error al abrir el archivo %s.\n", nombreArchivo);
         return ERROR_ARCH;
     }
 
-    void* posActual = v->vec;
     char linea[tamLinea];
 
     fgets(linea, tamLinea, pf);
-    while(fgets(linea, tamLinea, pf)) // Mientras haya un renglÛn que leer...
+    void *buffer = malloc(vectorTamElem(v));
+    if(!buffer)
     {
-        leer(linea, posActual); // Cargo campo por campo cada lÌnea en el vector de estructura
-        v->ce ++;
-
-        if(v->ce == v->capacidad)  // Nos fijamos si la cantidad de elementos del vector es igual a la capacidad, para aumentarla
-        {
-            if(!vectorRedimensionar(v, v->capacidad * FACTOR_INCR))
-            {
-                return ERROR_REALLOC;  // Si no es posible redimensionar el vector por falta de memoria devuelve error
-            }
-            posActual = v->vec + (v->ce-1) * v->tamElem;
-        }
-
-        posActual += v->tamElem;
+        fclose(pf);
+        return ERROR_REALLOC;
     }
+    while(fgets(linea, tamLinea, pf)) // Mientras haya un rengl√≥n que leer...
+    {
 
-    // Una vez cargamos todo en el vector, redimensionamos para que el archivo no ocupe memoria de m·s solo si hay mucha diferencia,
+        leer(linea, buffer); // Cargo campo por campo cada l√≠nea en el vector de estructura
+        if(!vectorInsertarFinal(v,buffer))
+        {
+            fclose(pf);
+            free(buffer);
+            return ERROR_REALLOC;
+        }
+    }
+    free(buffer);
+    // Una vez cargamos todo en el vector, redimensionamos para que el archivo no ocupe memoria de m√°s solo si hay mucha diferencia,
     // para evitar hacer un realloc no muy necesario si no hay tanta diferencia entre la cantidad y la capacidad.
-    // En este caso lo convertimos al mismo tamaÒo de elementos que tiene el vector ya que no vamos a cargar m·s que esos
+    // En este caso lo convertimos al mismo tama√±o de elementos que tiene el vector ya que no vamos a cargar m√°s que esos
     if(v->ce < v->capacidad/1.5)
     {
         vectorRedimensionar(v, v->ce);
     }
 
-    // IMPORTANTE no olvidar liberar la memoria din·mica al final del programa
+    // IMPORTANTE no olvidar liberar la memoria din√°mica al final del programa
 
     fclose(pf);
     return OK;
 }
 
-void leerLineaItems(const char* linea, void* pos) // No est· en el .h para que el usuario no pueda llamar a la funciÛn
+void leerLineaItems(const char* linea, void* pos) // No est√° en el .h para que el usuario no pueda llamar a la funci√≥n
 {
 
-    char* punteroLinea = strrchr(linea,';'); // Posicionamos el puntero justo antes del ˙ltimo campo del texto
+    char* punteroLinea = strrchr(linea,';'); // Posicionamos el puntero justo antes del √∫ltimo campo del texto
     ITEMS* actual = (ITEMS*) pos;
 
     // Indice
-    *punteroLinea = '\0'; // Nos aseguramos de que no haya ninguna basura despuÈs
+    *punteroLinea = '\0'; // Nos aseguramos de que no haya ninguna basura despu√©s
     punteroLinea++;
     reemplazar_coma(punteroLinea);
-    actual->indice = atof(punteroLinea); // tras testearlo, atoi/atof es un poco m·s r·pido que el sscanf
+    actual->indice = atof(punteroLinea); // tras testearlo, atoi/atof es un poco m√°s r√°pido que el sscanf
 
     // Nivel_general
     punteroLinea = strrchr(linea,';');
@@ -84,17 +85,17 @@ void leerLineaItems(const char* linea, void* pos) // No est· en el .h para que e
 
 }
 
-void leerLineaGeneral(const char* linea, void* pos) // No est· en el .h para que el usuario no pueda llamar a la funciÛn
+void leerLineaGeneral(const char* linea, void* pos) // No est√° en el .h para que el usuario no pueda llamar a la funci√≥n
 {
 
-    char* punteroLinea = strrchr(linea,';'); // Posicionamos el puntero justo antes del ˙ltimo campo del texto
+    char* punteroLinea = strrchr(linea,';'); // Posicionamos el puntero justo antes del √∫ltimo campo del texto
     GENERAL* actual = (GENERAL*) pos;
 
     // Indice
-    *punteroLinea = '\0'; // Nos aseguramos de que no haya ninguna basura despuÈs
+    *punteroLinea = '\0'; // Nos aseguramos de que no haya ninguna basura despu√©s
     punteroLinea++;
     reemplazar_coma(punteroLinea);
-    actual->indice = atof(punteroLinea); // tras testearlo, atoi/atof es un poco m·s r·pido que el sscanf
+    actual->indice = atof(punteroLinea); // tras testearlo, atoi/atof es un poco m√°s r√°pido que el sscanf
 
     // Nivel_general
     punteroLinea = strrchr(linea,';');
@@ -319,7 +320,7 @@ void llenarCampo(char *clas, int valor)
 {
     if(valor)
     {
-        strcpy(clas, "CapÌtulos");
+        strcpy(clas, "Cap√≠tulos");
     }else
     {
         strcpy(clas, "Nivel general");
@@ -334,7 +335,7 @@ void clasificadorItems(Vector *v)
    ITEMS *clas = (ITEMS*)vectorIteradorPrimero(&it);
    while(!vectorIteradorFinIter(&it))
    {
-       strcpy(clas->clasificador,"Õtems");
+       strcpy(clas->clasificador,"√çtems");
        clas = (ITEMS*)vectorIteradorSiguiente(&it);
    }
 }
@@ -457,7 +458,7 @@ void mostrarResultsBin(const char *nombreArchivo) {
     size_t leidos;
 
 
-    // Leer un RESULT cada iteraciÛn
+    // Leer un RESULT cada iteraci√≥n
     while ((leidos = fread(&reg, sizeof(RESULT), 1, pf)) == 1) {
         printf("%-15s | %-15s | %-40s | %-20s | %-30s\n",
                reg.periodo,
@@ -478,13 +479,13 @@ void varAnual(Vector *v)
 {
     VectorIterador it;
     vectorIteradorCrear(&it,v);
-    int cantidad = cantidad_indices(v);
+    int cantidadPorAnio = 12*cantidad_indices(v);
     UNIF *pos = (UNIF*)vectorIteradorPrimero(&it);
 
     double var;
-    //los del primer aÒo no tienen variacion, multiplicamos a cantidad por 12 ya que cantidad es los distintos indices que hay,
-    //representando un mes, entonces al multiplicarlo por 12 tenes el aÒo y queda casi igual que el codigo de var_mensual y limpio
-    for(int i = 0; i < cantidad*12; i++)
+    //los del primer a√±o no tienen variacion, multiplicamos a cantidad por 12 ya que cantidad es los distintos indices que hay,
+    //representando un mes, entonces al multiplicarlo por 12 tenes el a√±o y queda casi igual que el codigo de var_mensual y limpio
+    for(int i = 0; i < cantidadPorAnio; i++)
     {
         sprintf(pos->var_interanual,"NA");
         pos = (UNIF*)vectorIteradorSiguiente(&it);
@@ -492,12 +493,12 @@ void varAnual(Vector *v)
 
     while(!vectorIteradorFinIter(&it))
     {
-        pos = (UNIF*)it.act;
-        UNIF * posAnterior = (UNIF*)(it.act - (cantidad*12)*it.tamElem);
-
+        UNIF * posAnterior = vectorIteradorDesplazamiento(&it,-cantidadPorAnio);
+        vectorIteradorDesplazamiento(&it,cantidadPorAnio);
         var = ((pos->indice/posAnterior->indice)-1)*100;
         sprintf(pos->var_interanual,"%.2f",var);
-        vectorIteradorSiguiente(&it);
+
+        pos = vectorIteradorSiguiente(&it);
     }
 }
 
@@ -508,25 +509,28 @@ void varMensual(Vector *v)
     //calculamos cuantos tipos distintos de indices hay, ya que esto nos sirve para volver x cantidad de items atras
     //simulando un mes atras, mas eficiente y facil que realizar busquedas de fechas y demas, solo hay que realizar
     //una lectura de todo un mes para ver la cantidad que son y listo
-    int cantidad = cantidad_indices(v);
+    int cantidadPorMes = cantidad_indices(v);
     UNIF *pos = (UNIF*)vectorIteradorPrimero(&it);
 
     double var;
     //los del primer mes no tienen variacion
-    for(int i = 0; i < cantidad; i++)
+    for(int i = 0; i < cantidadPorMes; i++)
     {
         sprintf(pos->var_mensual,"NA");
         pos = (UNIF*)vectorIteradorSiguiente(&it);
+
     }
 
     while(!vectorIteradorFinIter(&it))
     {
-        pos = (UNIF*)it.act;
-        UNIF * posAnterior = (UNIF*)(it.act - (cantidad)*it.tamElem);
 
+        UNIF * posAnterior = vectorIteradorDesplazamiento(&it,-cantidadPorMes);
+        vectorIteradorDesplazamiento(&it,cantidadPorMes);
         var = ((pos->indice/posAnterior->indice)-1)*100;
         sprintf(pos->var_mensual,"%.2f",var);
-        vectorIteradorSiguiente(&it);
+
+        pos = (UNIF*)vectorIteradorSiguiente(&it);
+
     }
 
 }
@@ -568,7 +572,7 @@ int prioridad(const void *e1)
     if(strcmp(p1->clasificador,"Nivel general") == 0)
     {
         return 0;
-    }else if(strcmp(p1->clasificador,"CapÌtulos") == 0)
+    }else if(strcmp(p1->clasificador,"Cap√≠tulos") == 0)
     {
         return 1;
     }else
