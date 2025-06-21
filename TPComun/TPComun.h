@@ -10,5 +10,8 @@
 #define SIN_MEM 2
 #define ERR_BUFFER_CORTO 3
 #define TAMANOS_INCOMPATIBLES 4
+#define NO_ELEGIDO 5
+#define DUPLICADO 6
+#define FUERA_RANGO 7
 
 #endif

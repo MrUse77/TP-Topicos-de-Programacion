@@ -14,7 +14,7 @@
 				<Option parameters="../TP/archivos/indices_icc_general_capitulos.csv ../TP/archivos/Indices_items_obra.csv archivos/indices_unificado.dat" />
 				<Compiler>
 					<Add option="-g" />
-					<Add option="-ansi -Wall -Werror -pedantic -std=c89" />
+					<Add option="-ansi -Wall -Werror -std=c89" />
 				</Compiler>
 				<Linker>
 					<Add library="../TPVector/bin/Debug/libTPVector.a" />
@@ -36,7 +36,12 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-ansi -Wall -Werror -std=c89" />
 		</Compiler>
+		<Linker>
+			<Add library="../TPString/bin/Debug/libTPString.a" />
+			<Add library="../TPVector/bin/Debug/libTPVector.a" />
+		</Linker>
 		<Unit filename="funciones.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -9,32 +9,31 @@
 
 #define RUTA_TAM 254
 
-/* 
+/*
  * Nota:
- * Hay cosas duras en la vida, desaprobar un parcial, ver como Boca pierde la septima, 
+ * Hay cosas duras en la vida, desaprobar un parcial, ver como Boca pierde la septima,
    o tener que usar comentarios multilinea cuando solo quiero comentar una línea.
  * Atte: Los predicadores de Linux.
 */
 
-/* 
- * Nota 2: 
+/*
+ * Nota 2:
  * Tenemos al menos 6 chistes más sobre comentarios multilinea pero no queremos ocupar más espacio en el main.
-   Aunque considerando que ya estamos ocupando espacio con estas notas, pierde el sentido.
  * Atte: Los predicadores de Linux (de nuevo).
 */
 
-/* 
+/*
  * Argumentos a main:
- * TP.exe 
- * ../TP/archivos/indices_icc_general_capitulos.csv 
- * ../TP/archivos/Indices_items_obra.csv 
+ * TP.exe
+ * ../TP/archivos/indices_icc_general_capitulos.csv
+ * ../TP/archivos/Indices_items_obra.csv
  * archivos/indices_unificado.dat
 */
 int main (int argc, char* argv[]) {
 
     Vector vecIccGeneral, vecItemsObra;
     int cod;
-    
+
     system("chcp 65001 > nul");
 
     cod = vectorCrear(&vecIccGeneral, sizeof(Registro));
@@ -74,13 +73,13 @@ int main (int argc, char* argv[]) {
 
     vectorDestruir(&vecItemsObra);
 
-    /* 
-     *  Solo se compara por periodo y no por clasificador ya que, al concatenar los vectores y luego ordenar por periodo, 
+    /*
+     *  Solo se compara por periodo y no por clasificador ya que, al concatenar los vectores y luego ordenar por periodo,
         el clasificador también queda ordenado.
     */
     cod = vectorOrdenar(
-        &vecIccGeneral, 
-        INSERCION, 
+        &vecIccGeneral,
+        INSERCION,
         compRegistrosPeriodo
     );
 
@@ -89,6 +88,13 @@ int main (int argc, char* argv[]) {
 
     calcularVariacionMensual(&vecIccGeneral);
     calcularVariacionAnual(&vecIccGeneral);
+
+
+    /* También puede hacerse con esta otra función pero es menos eficiente en consumo de recursos por usar busqueda lineal. */
+
+    /*
+        calcularVariaciones(&vecIccGeneral);
+    */
 
     cod = cargarABinario(&vecIccGeneral, argv[ARG_NOM_ARCH_INDICES_UNIF]);
 

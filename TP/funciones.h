@@ -44,6 +44,7 @@ void corregirItemsObra (Registro* reg);
 int compRegistrosPeriodo (const void* regA, const void* regB);
 void calcularVariacionMensual (Vector* v);
 void calcularVariacionAnual (Vector* v);
+void calcularVariaciones (Vector* v);
 int cargarABinario (Vector* v, const char* nomArchBin);
 
 #endif

@@ -16,7 +16,7 @@
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
-					<Add option="-ansi -Wall -Werror -pedantic -std=c89" />
+					<Add option="-ansi -Wall -Werror -std=c89" />
 				</Compiler>
 				<Linker>
 					<Add library="../TPString/bin/Debug/libTPString.a" />
@@ -38,6 +38,12 @@
 				</Linker>
 			</Target>
 		</Build>
+		<Compiler>
+			<Add option="-ansi -Wall -Werror -std=c89" />
+		</Compiler>
+		<Linker>
+			<Add library="../TPString/bin/Debug/libTPString.a" />
+		</Linker>
 		<Unit filename="Vector.c">
 			<Option compilerVar="CC" />
 		</Unit>

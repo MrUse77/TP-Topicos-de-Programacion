@@ -16,7 +16,7 @@
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
-					<Add option="-ansi -Wall -Werror -pedantic -std=c89" />
+					<Add option="-ansi -Wall -Werror -std=c89" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -27,14 +27,17 @@
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
 				<Compiler>
-					<Add option="-Wall" />
 					<Add option="-O2" />
+					<Add option="-Wall" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 				</Linker>
 			</Target>
 		</Build>
+		<Compiler>
+			<Add option="-ansi -Wall -Werror -std=c89" />
+		</Compiler>
 		<Unit filename="string.c">
 			<Option compilerVar="CC" />
 		</Unit>

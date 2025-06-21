@@ -9,6 +9,7 @@ void corregirFecha (char* fecha);
 void desencriptarIccGeneral (char* str);
 void desencriptarItemsObra (char* str);
 void normalizarItemsObra (char* str);
+float variacionANMeses (Vector* v, Registro* reg, size_t meses);
 
 bool esLetra (char c);
 char aMayuscula(char c);
@@ -166,8 +167,6 @@ void desencriptarItemsObra (char* str) {
             *letraActual = *(vDes + pos);
         }
 
-
-
         letraActual++;
     }
 }
@@ -253,6 +252,69 @@ void calcularVariacionAnual (Vector* v) {
 
         reg = (Registro*) vectorIteradorSiguiente(&it);
     }
+}
+
+void calcularVariaciones (Vector* v) {
+
+    float vMensual, vAnual;
+    Registro* reg;
+    VectorIterador it;
+
+    vectorIteradorCrear(&it, v);
+    reg = (Registro*) vectorIteradorPrimero(&it);
+
+    while (!vectorIteradorFin(&it)) {
+        vMensual = variacionANMeses(v, reg, 1);
+        vAnual = variacionANMeses(v, reg, 12);
+
+        if (vMensual != 0)
+            sprintf(reg -> vMensual, "%.2f", vMensual);
+        else
+            copiarString(reg -> vMensual, "NA", V_MENSUAL_TAM -1);
+
+        if (vAnual != 0)
+            sprintf(reg -> vAnual, "%.2f", vAnual);
+        else
+            copiarString(reg -> vAnual, "NA", V_ANUAL_TAM -1);
+
+        reg = (Registro*) vectorIteradorSiguiente(&it);
+    }
+}
+
+/* Busca en el registro del mismo indice en la cantidad de meses indicadas y calcula su variación. */
+float variacionANMeses (Vector* v, Registro* reg, size_t meses) {
+
+    int dia, mes, anio, pos;
+    float variacion = 0;
+    Registro elem;
+
+    sscanf(reg -> periodo, "%d-%d-%d", &anio, &mes, &dia);
+
+    while (meses >= 12) {
+        anio--;
+        meses -= 12;
+    }
+
+    mes -= meses;
+
+    if (mes == 0) {
+        anio--;
+        mes = 12;
+    }
+
+    sprintf(elem.periodo, "%4d-%02d-%02d", anio, mes, dia);
+    copiarString(elem.nGeneralAperturas, reg -> nGeneralAperturas, N_GENERAL_APERTURAS_TAM -1);
+
+    /* 
+     * Para poder hacer esto con búsqueda binaria el comparador deberia poder verificar el orden 
+       de los nombres de cada indice en nivel_general_aperturas. 
+    */
+    pos = vectorDesordBuscar(v, &elem, compRegistrosPeriodoNGeneralAb);
+
+    if (pos != -1)
+        variacion = (atof(reg -> indiceICC) / atof(elem.indiceICC) -1) * 100;
+
+    return variacion;
 }
 
 /* Desglosa cada registro en 3 y los va cargando secuencialmente. */

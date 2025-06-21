@@ -4,10 +4,14 @@
 #include <string.h>
 #include <stdio.h>
 
+int ordenamientoBurbujeo (Vector* v, Cmp comparar);
+int ordenamientoSeleccion (Vector* v, Cmp comparar);
 int ordenamientoInsercion (Vector* v, Cmp comparar);
 bool redimensionarVector (Vector* v, int operacion);
 bool redimensionarVectorA (Vector* v, size_t redimension);
 size_t max (size_t a, size_t b);
+void intercambiar (void* a, void* b, void* aux, size_t tamElem);
+void* buscarMenor (void* ini, void* fin, size_t tamElem, Cmp comparar);
 
 int vectorCrear (Vector* v, size_t tamElem) {
 
@@ -16,14 +20,12 @@ int vectorCrear (Vector* v, size_t tamElem) {
     if (v -> vec == NULL) {
         v -> cantElem = 0;
         v -> cap = 0;
-        v -> cur = NULL;
         return SIN_MEM;
     }
 
     v -> cantElem = 0;
     v -> cap = CAP_INICIAL;
     v -> tamElem = tamElem;
-    v -> cur = v -> vec;
 
     return TODO_OK;
 }
@@ -45,7 +47,7 @@ int vectorCargarDeTxt (Vector* v, const char* nomArchTxt, Fmt formatear, size_t 
         fclose(archTxt);
         return SIN_MEM;
     }
-    
+
     reg = malloc(v -> tamElem);
 
     if (!reg) {
@@ -59,7 +61,7 @@ int vectorCargarDeTxt (Vector* v, const char* nomArchTxt, Fmt formatear, size_t 
         cod = formatear(reg, buffer);
 
         if (cod == TODO_OK)
-            cod = vectorAgregarAlFinal(v, reg);
+            cod = vectorInsertarAlFinal(v, reg);
     }
 
     fclose(archTxt);
@@ -92,7 +94,47 @@ int vectorCargarDeBin (Vector* v, const char* nomArchBin) {
     return TODO_OK;
 }
 
-int vectorAgregarAlFinal (Vector* v, void* elem) {
+int vectorGuardarEnBin (Vector* v, const char* nomArchBin) {
+
+    FILE* arch = fopen(nomArchBin, "wb");
+
+    if (!arch)
+        return ERR_ARCHIVO;
+
+    fwrite(v -> vec, v -> tamElem, v -> cantElem, arch);
+    fclose(arch);
+
+    return TODO_OK;
+}
+
+int vectorOrdInsertar (Vector* v, void* elem, Cmp comparar) {
+
+    if (v -> cantElem == v -> cap) {
+        if (!redimensionarVector(v, AUMENTAR))
+            return SIN_MEM;
+    }
+
+    char *i, *posIns, *ult;
+    ult = v -> vec + (v -> cantElem -1) * v -> tamElem;
+
+    posIns = v -> vec;
+
+    while (posIns <= ult && comparar(posIns, elem) < 0)
+        posIns += v -> tamElem;
+
+    if (posIns <= ult && comparar(posIns, elem) == 0)
+        return DUPLICADO;
+
+    for (i = ult; i >= posIns; i -= v -> tamElem)
+        memcpy(i + v -> tamElem, i, v -> tamElem);
+
+    memcpy(posIns, elem, v -> tamElem);
+    v -> cantElem++;
+
+    return TODO_OK;
+}
+
+int vectorInsertarAlFinal (Vector* v, void* elem) {
 
     if (v -> cantElem == v -> cap) {
         if (!redimensionarVector(v, AUMENTAR))
@@ -104,6 +146,36 @@ int vectorAgregarAlFinal (Vector* v, void* elem) {
     v -> cantElem++;
 
     return TODO_OK;
+}
+
+bool vectorEliminarDePos (Vector* v, int pos) {
+
+    if (pos < 0 || pos > v -> cantElem -1)
+        return false;
+
+    char* posElim = v -> vec + pos * v -> tamElem;
+    char* final = v -> vec + v -> cantElem * v -> tamElem;
+
+    memmove(posElim, posElim + v -> tamElem, final - posElim);
+
+    v -> cantElem--;
+
+    if ((float) v -> cantElem / v -> cap <= FACTOR_OCUP)
+        redimensionarVector(v, DISMINUIR);
+
+    return true;
+}
+
+bool vectorOrdEliminar (Vector* v, void* elem, Cmp comparar) {
+
+    int pos = vectorOrdBuscar(v, elem, comparar);
+
+    if (pos == -1)
+        return false;
+
+    vectorEliminarDePos(v, pos);     
+
+    return true;
 }
 
 void vectorMostrar (Vector* v, Imp imprimir) {
@@ -189,16 +261,6 @@ int vectorUnir (Vector* v1, Vector* v2) {
     return TODO_OK;
 }
 
-void vectorEliminarDePos (Vector* v, int pos) {
-
-    char* posElim = v -> vec + pos * v -> tamElem;
-    char* final = v -> vec + v -> cantElem * v -> tamElem;
-
-    memmove(posElim, posElim + v -> tamElem, final - posElim);
-
-    v -> cantElem--;
-}
-
 void vectorDestruir (Vector* v) {
     free(v -> vec);
 
@@ -206,14 +268,30 @@ void vectorDestruir (Vector* v) {
     v -> cap = 0;
     v -> tamElem = 0;
     v -> cantElem = 0;
-    v -> cur = NULL;
+}
+
+void vectorRecorrer (const Vector* v, Accion accion, void* datos) {
+
+    char* i;
+    char* ult = v -> vec + (v -> cantElem -1) * v -> tamElem;
+
+    for (i = v -> vec; i <= ult; i += v -> tamElem)
+        accion(i, datos);
 }
 
 int vectorOrdenar (Vector* v, int metodo, Cmp comparar) {
 
-    int cod;
+    int cod = NO_ELEGIDO;
 
     switch (metodo) {
+        case BURBUJEO:
+            cod = ordenamientoBurbujeo(v, comparar);
+            break;
+
+        case SELECCION:
+            cod = ordenamientoSeleccion(v, comparar);
+            break;
+
         case INSERCION:
             cod = ordenamientoInsercion(v, comparar);
             break;
@@ -223,6 +301,7 @@ int vectorOrdenar (Vector* v, int metodo, Cmp comparar) {
 }
 
 int ordenamientoInsercion (Vector* v, Cmp comparar) {
+
     char* ult = v -> vec + (v -> cantElem -1) * v -> tamElem;
     char *i, *j, *elem;
 
@@ -235,7 +314,7 @@ int ordenamientoInsercion (Vector* v, Cmp comparar) {
         memcpy(elem, i, v -> tamElem);
         j = i - v -> tamElem;
 
-        while (j >= v -> vec && comparar(j, elem) > 0)
+        while (j >= (char*) v -> vec && comparar(j, elem) > 0)
             j -= v -> tamElem;
 
         memmove(j + v -> tamElem * 2, j + v -> tamElem, i - (j + v -> tamElem));
@@ -247,9 +326,53 @@ int ordenamientoInsercion (Vector* v, Cmp comparar) {
     return TODO_OK;
 }
 
-bool redimensionarVector (Vector* v, int operacion) {
+int ordenamientoBurbujeo (Vector* v, Cmp comparar) {
 
-    int posCur;
+    void* aux = malloc(v -> tamElem);
+
+    if (!aux)
+        return SIN_MEM;
+
+    int i;
+    void *j, *ult;
+    ult = v -> vec + (v -> cantElem -1) * v -> tamElem;
+
+    for (i = 0; i < v -> cantElem -1; i++) {
+
+        for (j = v -> vec; j < ult - i * v -> tamElem; j += v -> tamElem) {
+            if (comparar(j, j + v -> tamElem) > 0) {
+                intercambiar(j, j + v -> tamElem, aux, v -> tamElem);
+            }
+        }
+    }
+
+    free(aux);
+
+    return TODO_OK;
+}
+
+int ordenamientoSeleccion (Vector* v, Cmp comparar) {
+
+    void* aux = malloc(v -> tamElem);
+
+    if (!aux)
+        return SIN_MEM;
+
+    char *i, *m, *ult;
+    ult = v -> vec + (v -> cantElem -1) * v -> tamElem;
+
+    for (i = v -> vec; i < ult; i += v -> tamElem) {
+        m = buscarMenor(i, ult, v -> tamElem, comparar);
+        intercambiar(i, m, aux, v -> tamElem);
+    }
+
+    free(aux);
+
+    return TODO_OK;
+}
+
+
+bool redimensionarVector (Vector* v, int operacion) {
 
     size_t nuevaCap = operacion == AUMENTAR
     ? v -> cap * FACT_INCR
@@ -262,18 +385,14 @@ bool redimensionarVector (Vector* v, int operacion) {
         return false;
     }
 
-    posCur = v -> cur - v -> vec;
-
     v -> vec = nVec;
     v -> cap = nuevaCap;
-    v -> cur = v -> vec + posCur;
 
     return true;
 }
 
 bool redimensionarVectorA (Vector* v, size_t redimension) {
 
-    int posCur;
     size_t nuevaCap = max(CAP_INICIAL, redimension);
     char* nVec = realloc(v -> vec, nuevaCap * v -> tamElem);
 
@@ -282,17 +401,34 @@ bool redimensionarVectorA (Vector* v, size_t redimension) {
         return false;
     }
 
-    posCur = v -> cur - v -> vec;
-
     v -> vec = nVec;
     v -> cap = nuevaCap;
-    v -> cur = v -> vec + posCur;
 
     return true;
 }
 
 size_t max (size_t a, size_t b) {
     return a >= b ? a : b;
+}
+
+void intercambiar (void* a, void* b, void* aux, size_t tamElem) {
+    memcpy(aux, a, tamElem);
+    memcpy(a, b, tamElem);
+    memcpy(b, aux, tamElem);
+}
+
+void* buscarMenor (void* ini, void* fin, size_t tamElem, Cmp comparar) {
+
+    char *m, *j;
+    m = ini;
+
+    for (j = ini + tamElem; j <= (char*) fin; j += tamElem) {
+
+        if (comparar(j, m) < 0)
+            m = j;
+    }
+
+    return m;
 }
 
 /* Vector iterador */
@@ -327,11 +463,11 @@ void* vectorIteradorSiguiente (VectorIterador* it) {
 
     char* siguiente = it -> act + v -> tamElem;
 
-    if (siguiente > it -> ult) {
+    if (siguiente > (char*) it -> ult) {
         it -> finIter = true;
         return NULL;
 
-    } else if (siguiente <= v -> vec)
+    } else if (siguiente <= (char*) v -> vec)
         return NULL;
 
     it -> act = siguiente;
@@ -343,7 +479,7 @@ void* vectorIteradorDesplazamiento (VectorIterador *it, size_t cantidad) {
     const Vector *v = it -> vector;
     char* cur = it -> act + v-> tamElem * cantidad;
 
-    if (cur < v -> vec || cur > it -> ult)
+    if (cur < (char*) v -> vec || cur > (char*) it -> ult)
         return NULL;
 
     it -> act = cur;
