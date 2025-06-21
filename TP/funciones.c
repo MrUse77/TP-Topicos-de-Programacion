@@ -153,8 +153,8 @@ void desencriptarIccGeneral (char* str) {
 void desencriptarItemsObra (char* str) {
 
     char* letraActual = str;
-    const char vEnc[] = "@8310$7|59";
-    const char vDes[] = "abeiostlmn";
+    char vEnc[] = "@8310$7|59";
+    char vDes[] = "abeiostlmn";
     int pos;
     char* dir;
 
@@ -254,6 +254,7 @@ void calcularVariacionAnual (Vector* v) {
     }
 }
 
+/* Otra forma de hacer las variaciones, pero menos eficiente por usar búsqueda lineal. Descomentar en el main en caso de querer probarla. */
 void calcularVariaciones (Vector* v) {
 
     float vMensual, vAnual;
@@ -390,12 +391,10 @@ void copiarReg (Vector* v, RegistroExportado* regExp, Registro* reg, const char*
 
         if (compararString(tVariable, "indice_icc") == 0)
             copiarString(valor, reg -> indiceICC, VALOR_TAM);
-        else {
-            if (compararString(tVariable, "var_mensual") == 0)
-                copiarString(valor, reg -> vMensual, VALOR_TAM);
-            else
-                copiarString(valor, reg -> vAnual, VALOR_TAM);
-        }
+        else if (compararString(tVariable, "var_mensual") == 0)
+            copiarString(valor, reg -> vMensual, VALOR_TAM);
+        else
+            copiarString(valor, reg -> vAnual, VALOR_TAM);
 
         copiarString(regExp -> periodo, reg -> periodo, PERIODO_TAM);
         copiarString(regExp -> clasificador, reg -> clasificador, CLASIFICADOR_TAM);

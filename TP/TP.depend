@@ -50,7 +50,7 @@
 	"./funciones.h"
 	"../TPString/string.h"
 
-1750470407 source:e:\programacion\c\tpluis\tp-topicos-de-programacion\tp\funciones.c
+1750512794 source:e:\programacion\c\tpluis\tp-topicos-de-programacion\tp\funciones.c
 	"./funciones.h"
 	"../TPString/string.h"
 	<string.h>
@@ -69,7 +69,7 @@
 1750180829 e:\programacion\c\tpluis\tp-topicos-de-programacion\tpstring\string.h
 	<stddef.h>
 
-1750476998 source:e:\programacion\c\tpluis\tp-topicos-de-programacion\tp\main.c
+1750513023 source:e:\programacion\c\tpluis\tp-topicos-de-programacion\tp\main.c
 	<stdio.h>
 	<stdlib.h>
 	"./funciones.h"
