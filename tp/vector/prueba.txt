@@ -1,0 +1,4 @@
+Juan Perez;Sistemas;1234;55000
+Ana Gomez;Sistemas;5678;60000
+Luis Martinez;Ventas;9101,45000
+Maria Lopez;
