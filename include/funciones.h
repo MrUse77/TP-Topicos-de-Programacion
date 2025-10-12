@@ -4,8 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+<<<<<<< HEAD
 #include "strings.h" /* Nuestra bibioteca de strings (termina en s). */
 #include "vector.h" /* Nuestra bibioteca de vectores (termina en r). */
+=======
+#include <strings.h> /* Nuestra bibioteca de strings (termina en s). */
+>>>>>>> origin/main
 
 /* Nombres de archivos */
 #define NOMBRE_ARCH_AUXILIAR "auxiliar.tmp"
@@ -21,9 +25,16 @@
 #define PERIODO_TAM 11
 /* Algunos valores en nivel_general_aperturas de indices_items_obras.csv poseen hasta 40 caracteres */
 #define NIVEL_TAM 41
+<<<<<<< HEAD
 #define VALOR_TAM 32
 #define CLASIFICADOR_TAM 14 /* Booleanos */
 #define TIPO_VARIABLE_TAM 15
+=======
+#define INDICE_TAM 17
+#define CLASIFICADOR_TAM 14
+
+/* Booleanos */
+>>>>>>> origin/main
 #define bool int
 #define false 0
 #define true 1
@@ -46,6 +57,7 @@ typedef struct {
 
 typedef void (*Formatear)(Registro *reg);
 
+<<<<<<< HEAD
 int copiarArchivoTxt(char *nomArchDest, char *nomArchOrig);
 int corregirArchivo(char *nomArchOrig, Formatear realizarFormateos,
 		    Vector *vec);
@@ -54,5 +66,11 @@ void formatearNivelGeneral(Registro *reg);
 void formatearItemsObra(Registro *reg);
 void ordenarRegistros(Vector *vBin);
 void crearYescribirArchivoBinario(Vector *vBin, const char *path);
+=======
+int copiarArchivoTxt (char* nomArchDest, char* nomArchOrig);
+int corregirArchivo (char* nomArchOrig, Formatear realizarFormateos);
+void formatearNivelGeneral (Registro* reg);
+void formatearItemsObra (Registro* reg);
+>>>>>>> origin/main
 
 #endif

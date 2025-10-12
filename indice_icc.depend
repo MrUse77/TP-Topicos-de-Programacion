@@ -37,6 +37,7 @@
 	<string.h>
 	"../include/strings.h"
 
+<<<<<<< HEAD
 1750095783 source:/home/agustin/Documentos/unlam/Topicos/TP/main.c
 	"include/vector.h"
 	<stdio.h>
@@ -109,3 +110,5 @@
 1750082127 source:/home/agustin/Documentos/unlam/Topicos/tp-bak/src/vector.c
 	"../include/vector.h"
 
+=======
+>>>>>>> origin/main

@@ -68,7 +68,11 @@ int intercambiar(void* a, void* b, size_t tamElem);
 
 /*Iterar por el vector*/
 int vectorRecorrer(Vector* vec, Accion actFunc);
+<<<<<<< HEAD
 int vectorMostrar(Vector* vec, Imprimir imprFunc);
+=======
+int mostrarVector(Vector* vec, Imprimir imprFunc);
+>>>>>>> origin/main
 
 /*Extras*/
 size_t vectorTam(Vector* vec);

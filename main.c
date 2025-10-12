@@ -55,16 +55,22 @@ int main()
 	if (!v.data)
 		return ERR_ARCHIVO;
 
+<<<<<<< HEAD
 	cod = corregirArchivo(dirArchivos, formatearNivelGeneral, &v);
 	if (cod != TODO_OK) {
 		destruirVector(&v);
 		return cod;
 	}
 	/*vectorMostrar(&v, imprimirReg);*/
+=======
+    copiarString(dirArchivos, "archivos/", 254);
+    concatenarString(dirArchivos, NOMBRE_ARCH_INDICES_OBRA, 254);
+>>>>>>> origin/main
 
 	copiarString(dirArchivos, "archivos/", 254);
 	concatenarString(dirArchivos, NOMBRE_ARCH_INDICES_OBRA, 254);
 
+<<<<<<< HEAD
 	v2 = *crearVector(&v2, sizeof(Registro));
 	cod = corregirArchivo(dirArchivos, formatearItemsObra, &v2);
 	if (cod != TODO_OK) {
@@ -102,3 +108,7 @@ void imprimirRegBin(const void *reg)
 	printf("%11s;%17s;%41s;%15s;%32s\n", r->periodo, r->clasificador,
 	       r->nivel_general_aperturas, r->tipo_variable, r->valor);
 }
+=======
+    return TODO_OK;
+}
+>>>>>>> origin/main

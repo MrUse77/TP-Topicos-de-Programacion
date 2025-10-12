@@ -1,7 +1,10 @@
 #include "../include/funciones.h"
 #include "../include/strings.h"
+<<<<<<< HEAD
 #include <stdio.h>
 #include <stdlib.h>
+=======
+>>>>>>> origin/main
 
 /* Prototipos internos */
 
@@ -18,10 +21,18 @@ char *agregarCampoEnCabecera(char *buffer, char *nombreCampo, Registro *reg,
 char *desencriptarItemsObra(char *str, const char *v_enc, const char *v_des);
 char *normalizarItemsObra(char *str);
 
+<<<<<<< HEAD
 void *buscarEnVector(const void *vec, size_t cantElem, size_t tamElem,
 		     void *elem, Comparar cmp);
 int agregarRegistrosBin(Registro *reg, RegistroBin *regBin, Vector *vBin);
 void calcularVariaciones(Vector *vec);
+=======
+void* buscarEnVector (const void* vec, size_t cantElem, size_t tamElem, void* elem, Cmp cmp);
+
+int esLetra(char* c);
+char aMayus(char* c);
+int cmpChar (void* a, void* b);
+>>>>>>> origin/main
 
 int esLetra(char *c);
 char aMayus(char *c);
@@ -81,7 +92,48 @@ int generarArchivoAuxiliar(FILE *orig, Formatear realizarFormateos, Vector *vec)
 		codRet = ERR_ARCHIVO;
 	}
 
+<<<<<<< HEAD
 	return codRet;
+=======
+    /* Obtiene la linea de la cabecera y añade el campo clasificador. */
+    if (!agregarCampoEnCabecera(buffer, "Clasificador", &reg, temp, orig))
+        return ERR_BUFFER_CORTO;
+
+    /* Obtiene la siguiente linea y verifica que esta posea el formato correcto. */
+    fgets(buffer, BUFFER_TAM, orig);
+
+    dirSaltoLinea = buscarEnVector(buffer, BUFFER_TAM, sizeof(char), &aBuscar, cmpChar);
+
+    if (!dirSaltoLinea)
+        return ERR_BUFFER_CORTO;
+
+    *dirSaltoLinea = '\0';
+
+    while (codRet != ERR_BUFFER_CORTO && !feof(orig)) {
+
+        /* Obtiene los valores de los campos y realiza los formateos. */
+        sscanf(buffer, FORMATO_REGISTROS, reg.periodo, reg.nivel, reg.indiceICC);
+
+        realizarFormateos(&reg);
+
+        /* Escribe el registro formateado en el archivo auxiliar. */
+        fprintf(temp, "\"%s\";\"%s\";%s;\"%s\"\n", reg.periodo, reg.nivel, reg.indiceICC, reg.clasificador);
+
+        /* Obtiene la siguiente linea y verifica que esta posea el formato correcto. */
+        fgets(buffer, BUFFER_TAM, orig);
+
+        dirSaltoLinea = buscarEnVector(buffer, BUFFER_TAM, sizeof(char), &aBuscar, cmpChar);
+
+        if (!dirSaltoLinea) {
+            if (!feof(orig))
+                codRet = ERR_BUFFER_CORTO;
+        } else
+            *dirSaltoLinea = '\0';
+
+    }
+
+    return codRet;
+>>>>>>> origin/main
 }
 /*
 * Realiza todas las correcciones para indices_icc_general_capitulos.csv
@@ -416,9 +468,20 @@ int copiarArchivoTxt(char *nomArchDest, char *nomArchOrig)
 		return ERR_ARCHIVO;
 	}
 
+<<<<<<< HEAD
 	char buffer[BUFFER_TAM];
 	char *dirSaltoLinea;
 	char aBuscar = '\n';
+=======
+    if (!dest) {
+        fclose(orig);
+        return ERR_ARCHIVO;
+    }
+
+    char buffer[BUFFER_TAM];
+    char* dirSaltoLinea;
+    char aBuscar = '\n';
+>>>>>>> origin/main
 
 	fgets(buffer, BUFFER_TAM, orig);
 
@@ -428,10 +491,20 @@ int copiarArchivoTxt(char *nomArchDest, char *nomArchOrig)
 	if (!dirSaltoLinea)
 		return ERR_BUFFER_CORTO;
 
+<<<<<<< HEAD
 	while (!feof(orig)) {
 		fprintf(dest, "%s", buffer);
 		fgets(buffer, BUFFER_TAM, orig);
 	}
+=======
+    while (!feof(orig)) {
+        fprintf(dest, "%s", buffer);
+        fgets(buffer, BUFFER_TAM, orig);
+    }
+
+    fclose(orig);
+    fclose(dest);
+>>>>>>> origin/main
 
 	fclose(orig);
 	fclose(dest);
@@ -459,6 +532,7 @@ int agregarRegistrosBin(Registro *reg, RegistroBin *regBin, Vector *vBin)
 	if (!reg || !regBin || !vBin)
 		return ERROR;
 
+<<<<<<< HEAD
 	for (i = 0; i < 3; i++) {
 		copiarString(regBin->periodo, reg->periodo, PERIODO_TAM - 1);
 		copiarString(regBin->nivel_general_aperturas, reg->nivel,
@@ -493,6 +567,8 @@ int agregarRegistrosBin(Registro *reg, RegistroBin *regBin, Vector *vBin)
 	return EXITO;
 }
 
+=======
+>>>>>>> origin/main
 /* ------------------------------------------------ Auxiliares ------------------------------------------------ */
 
 /*Funcion auxiliar, para saber si un char es letra, igual que isalpha form ctype.h*/
@@ -505,9 +581,15 @@ int esLetra(char *c)
 /*Funcion auxiliar, pasa el caracter a mayúsculas */
 char aMayus(char *c)
 {
+<<<<<<< HEAD
 	char aux = *c;
 	aux -= 32;
 	return aux;
+=======
+    char aux = *c;
+    aux -= 32;
+    return aux;
+>>>>>>> origin/main
 }
 
 /*
@@ -518,6 +600,7 @@ int cmpChar(const void *a, const void *b)
 	const char *c1 = a;
 	const char *c2 = b;
 
+<<<<<<< HEAD
 	return *c1 - *c2;
 }
 
@@ -578,4 +661,7 @@ int compararRegistrosBinOpt(const void *a, const void *b)
 	if (cmpPeriodo != 0)
 		return cmpPeriodo;
 	return compararString(datoA->clasificador, datoB->clasificador);
+=======
+    return *c1 - *c2;
+>>>>>>> origin/main
 }
