@@ -1,114 +1,125 @@
-#include "include/vector.h"
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
-#include "include/funciones.h"
+#include "includes/string.h"
+#include "includes/vector.h"
 
-/* Esto podría ir como argumentos a main */
-#define NOMBRE_ARCH_INDICES_GENERAL "indices_icc_general_capitulos.csv"
-#define NOMBRE_ARCH_INDICES_OBRA "Indices_items_obra.csv"
-#define NOMBRE_ARCH_INDICES_GENERAL_BIN "indices_icc_general_capitulos.bin"
+#define IPC_DIV "./public/serie_ipc_divisiones.csv"
 
-/*
- * 1. Corrección de indices nivel general.
- * 2. Corrección de indices items obra.
- * 3. Unificación y ordenamiento de estructuras.
- * 4. Calculo de variaciones mensuales e interanuales.
- * 5. Exportado a binario.
-*/
-void imprimirReg(const void *);
-void imprimirRegBin(const void *);
+typedef struct {
+	char code[21];
+	char desc[31];
+	char clasificador[31];
+	char indice_ipc[17];
+	char v_m_ipc[17];
+	char v_a_ipc[17];
+	char region[10];
+	char periodo[17]; //AAAAMM
+} serie_ipc;
+
+void print(const void *elem);
+void decodificarFecha(char *fecha);
+void formatear(char *c, void *elem);
+void formatearFecha(char *c);
 int main()
 {
-	int cod;
-
-	char dirArchivos[255] = "archivos/";
-	/*
-     * Esto regenera los archivos a su estado original para evitar tener que copiar los archivos originales
-       cada vez que se quiere probar algo nuevo. El tamaño de los strings que alojan el path completo esta seteado en 255
-       para asegurar que no se queden cortos. Esto podría reemplazarse por una librería de strings dinámicos.
-
-
-	concatenarString(dirArchivos, NOMBRE_ARCH_INDICES_GENERAL, 254);
-	concatenarString(dirBackup, NOMBRE_ARCH_INDICES_GENERAL, 254);
-
-	cod = copiarArchivoTxt(dirArchivos, dirBackup);
-
-	if (cod != TODO_OK)
-		return cod;
-
-	copiarString(dirBackup, "backup/", 254);
-	copiarString(dirArchivos, "archivos/", 254);
-	concatenarString(dirArchivos, NOMBRE_ARCH_INDICES_OBRA, 254);
-	concatenarString(dirBackup, NOMBRE_ARCH_INDICES_OBRA, 254);
-
-	cod = copiarArchivoTxt(dirArchivos, dirBackup);
-
-	if (cod != TODO_OK)
-		return cod;
-*/
-	/* Acá ya arranca la corrección propiamente dicha */
-
-	concatenarString(dirArchivos, NOMBRE_ARCH_INDICES_GENERAL, 254);
-
-	Vector v, v2, vBin;
-	v = *crearVector(&v, sizeof(Registro));
-	if (!v.data)
-		return ERR_ARCHIVO;
-
-<<<<<<< HEAD
-	cod = corregirArchivo(dirArchivos, formatearNivelGeneral, &v);
-	if (cod != TODO_OK) {
-		destruirVector(&v);
-		return cod;
+	FILE *f = fopen(IPC_DIV, "r");
+	if (!f) {
+		printf("Error al abrir el archivo %s\n", IPC_DIV);
+		return -1;
 	}
-	/*vectorMostrar(&v, imprimirReg);*/
-=======
-    copiarString(dirArchivos, "archivos/", 254);
-    concatenarString(dirArchivos, NOMBRE_ARCH_INDICES_OBRA, 254);
->>>>>>> origin/main
+	int code = 0;
+	Vector v;
+	VectorIterador it;
+	code = vectorCrear(&v, sizeof(serie_ipc));
+	vectorIteradorCrear(&it, &v);
+	code = vectorInsertarDeArchivoTXT(&v, f, formatear, 2);
 
-	copiarString(dirArchivos, "archivos/", 254);
-	concatenarString(dirArchivos, NOMBRE_ARCH_INDICES_OBRA, 254);
-
-<<<<<<< HEAD
-	v2 = *crearVector(&v2, sizeof(Registro));
-	cod = corregirArchivo(dirArchivos, formatearItemsObra, &v2);
-	if (cod != TODO_OK) {
-		destruirVector(&v);
-		destruirVector(&v2);
-		return cod;
+	serie_ipc *s = (serie_ipc *)vectorIteradorPrimero(&it);
+	while (!vectorIteradorFin(&it)) {
+		formatearFecha(s->periodo);
+		s = (serie_ipc *)vectorIteradorSiguiente(&it);
 	}
+	vectorMostrar(&v, print);
 
-	vBin = *crearVector(&vBin, sizeof(RegistroBin));
-	cod = unirRegistros(&v, &v2, &vBin);
-	ordenarRegistros(&vBin);
-	if (cod != TODO_OK) {
-		destruirVector(&v);
-		destruirVector(&v2);
-		return cod;
-	}
-	copiarString(dirArchivos, "archivos/", 254);
-	concatenarString(dirArchivos, NOMBRE_ARCH_INDICES_GENERAL_BIN, 254);
-	crearYescribirArchivoBinario(&vBin, dirArchivos);
-
-	destruirVector(&v);
-	destruirVector(&v2);
-	return TODO_OK;
+	vectorDestruir(&v);
+	return code;
 }
-void imprimirReg(const void *reg)
+
+void print(const void *elem)
 {
-	const Registro *r = reg;
-	printf("%20s;%20s;%.17f;%20s;%20s;%20s\n", r->periodo, r->nivel,
-	       r->indiceICC, r->clasificador, r->var_mensual,
-	       r->var_interanual);
+	serie_ipc *s = (serie_ipc *)elem;
+	printf("%s;%s;%s;%s;%s;%s;%s;%s\n", s->code, s->desc, s->clasificador,
+	       s->indice_ipc, s->v_m_ipc, s->v_a_ipc, s->region, s->periodo);
 }
-void imprimirRegBin(const void *reg)
+// TODO: Solucionar cpyString de mi propia libreria de string
+void formatear(char *c, void *elem)
 {
-	const RegistroBin *r = reg;
-	printf("%11s;%17s;%41s;%15s;%32s\n", r->periodo, r->clasificador,
-	       r->nivel_general_aperturas, r->tipo_variable, r->valor);
+	serie_ipc *s = (serie_ipc *)elem;
+
+	char *act = buscarCharEnStringEnReversa(c, '\n');
+	*act = '\0';
+	act = buscarCharEnStringEnReversa(c, ';');
+	char aux[17];
+	strcpy(aux, act + 1);
+	formatearFecha(aux);
+	strcpy(s->periodo, aux);
+
+	*act = '\0';
+	act = buscarCharEnStringEnReversa(c, ';');
+	strcpy(s->region, act + 1);
+
+	*act = '\0';
+	act = buscarCharEnStringEnReversa(c, ';');
+	strcpy(s->v_a_ipc, act + 1);
+
+	*act = '\0';
+	act = buscarCharEnStringEnReversa(c, ';');
+	strcpy(s->v_m_ipc, act + 1);
+
+	*act = '\0';
+	act = buscarCharEnStringEnReversa(c, ';');
+	strcpy(s->indice_ipc, act + 1);
+
+	*act = '\0';
+	act = buscarCharEnStringEnReversa(c, ';');
+	strcpy(s->clasificador, act + 1);
+
+	*act = '\0';
+	act = buscarCharEnStringEnReversa(c, ';');
+	strcpy(s->desc, act + 1);
+
+	*act = '\0';
+	strcpy(s->code, c);
 }
-=======
-    return TODO_OK;
+void decodificarFecha(char *fecha)
+{
+	char *cod = "46871 5032";
+	fecha[0] = cod[(int)(*(fecha) - '0')];
+	fecha[1] = cod[(int)(*(fecha + 1) - '0')];
+	fecha[2] = cod[(int)(*(fecha + 2) - '0')];
+	fecha[3] = cod[(int)(*(fecha + 3) - '0')];
+	fecha[4] = cod[(int)(*(fecha + 4) - '0')];
+	fecha[5] = cod[(int)(*(fecha + 5) - '0')];
 }
->>>>>>> origin/main
+void formatearFecha(char *c)
+{
+	char meses[12][10] = {
+		"Enero",      "Febrero", "Marzo",     "Abril",
+		"Mayo",	      "Junio",	 "Julio",     "Agosto",
+		"Septiembre", "Octubre", "Noviembre", "Diciembre"
+	};
+	decodificarFecha(c);
+	char mesReg[3];
+	strncpy(mesReg, c + 4, 2);
+	int mes = atoi(mesReg) - 1;
+	//AAAA MM
+	size_t len = lenString(meses[mes]);
+	char anio[5];
+	strncpy(anio, c, 4);
+	//MMMMMMMMMM-AAAA
+	memcpy(c, meses[mes], len);
+	c += len;
+	*c = '-';
+	strcpy(c + 1, anio);
+}
