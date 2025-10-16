@@ -176,11 +176,10 @@ char *removerCharEnString(char *str, char c)
 	*dst = '\0';
 	return str; // Retorna la cadena con los caracteres removidos
 }
-
 bool includeString(const char *str, const char **arr, size_t size)
 {
-	const char **ult = arr + size;
-	while (arr < ult) {
+	const char **ult = arr + size - 1;
+	while (arr <= ult) {
 		if (cmpString(str, *arr) == 0) {
 			return true;
 		}

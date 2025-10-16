@@ -44,6 +44,7 @@ typedef struct {
 } VectorIterador;
 
 typedef int (*Cmp)(const void *, const void *); //Puntero a funcion
+typedef int (*CmpFil)(const void *); //Puntero a funcion para filtros
 typedef void (*Fmt)(const void *);
 typedef void (*FmtInsert)(char *, void *);
 typedef void (*FmtRead)(char *, void *);
@@ -75,6 +76,7 @@ void *vectorOrdBuscar(const Vector *v, void *elem, Cmp cmp);
 bool vectorOrdEliminar(Vector *v, void *elem, Cmp cmp);
 bool vectorEliminar(Vector *v, void *elem, Cmp cmp);
 bool vectorEliminarDePosicion(Vector *v, size_t pos);
+bool vectorEliminarPorFiltro(Vector *v, CmpFil cmp);
 
 //Ordenamiento
 int vectorOrdenar(Vector *V, int metodo, Cmp cmp);
@@ -91,6 +93,7 @@ void *vectorIteradorPrimero(VectorIterador *it);
 void *vectorIteradorSiguiente(VectorIterador *it);
 void *vectorIteradorDesplazamiento(VectorIterador *it, size_t cantidad);
 bool vectorIteradorFin(VectorIterador *it);
+void *vectorIteradorActual(VectorIterador *it);
 
 /*** No Primitivas ***/
 

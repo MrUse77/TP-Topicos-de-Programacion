@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -5,20 +6,29 @@
 #include "includes/vector.h"
 
 #define IPC_DIV "./public/serie_ipc_divisiones.csv"
+#define BIENES 5
+#define SERVICIOS 7
+#define REGIONES 7
 
 typedef struct {
+	char fecha[11];
+	char region[10];
+	char bienes[17];
+	char servicios[17];
+} indices;
+typedef struct {
 	char code[21];
-	char desc[35];
+	char desc[55];
 	char clasificador[35];
 	char indice_ipc[17];
 	char v_m_ipc[17];
 	char v_a_ipc[17];
 	char region[10];
-	char periodo[17]; //AAAAMM
+	char periodo[18]; //AAAAMM
 } serie_ipc_divisiones;
 typedef struct {
-	char fecha[11]; //AAAA-MM-DD
-	char desc[35];
+	char fecha[18]; //AAAA-MM-DD
+	char desc[55];
 	char indice_ipc[17];
 	char region[10];
 	char grupo[10];
@@ -26,11 +36,16 @@ typedef struct {
 typedef struct {
 	int monto;
 	char region[10];
-	char fechaDesde[17];
-	char fechaHasta[17];
+	char fechaDesde[18];
+	char fechaHasta[18];
 } filtroIPC;
 
-void clasificarDivisiones(Vector *B, Vector *S, Vector *v);
+int regNacional(const void *elem);
+void promedioMensual(VectorIterador it, char *region, char *fecha,
+		     indices *prom);
+char *formatearFecha2(char *c);
+void calcularPromedioMensual(Vector *D);
+void clasificarDivisiones(Vector *D, Vector *v);
 void normalizar(char *c);
 void seleccionarRegion(char *region);
 void calcularIPC(char *sDesde, char *sHasta, int monto);
@@ -61,10 +76,10 @@ int main()
 	//filtroIPC filtro;
 	//menu(&filtro);
 	//generarHerramienta(filtro, &v);
-	Vector Bienes, Servicios;
-	vectorCrear(&Bienes, sizeof(divisiones));
-	vectorCrear(&Servicios, sizeof(divisiones));
-	clasificarDivisiones(&Bienes, &Servicios, &v);
+	Vector Divisiones;
+	vectorCrear(&Divisiones, sizeof(divisiones));
+	clasificarDivisiones(&Divisiones, &v);
+	calcularPromedioMensual(&Divisiones);
 
 	vectorDestruir(&v);
 	return code;
@@ -75,6 +90,17 @@ void print(const void *elem)
 	serie_ipc_divisiones *s = (serie_ipc_divisiones *)elem;
 	printf("%s;%s;%s;%s;%s;%s;%s;%s\n", s->code, s->desc, s->clasificador,
 	       s->indice_ipc, s->v_m_ipc, s->v_a_ipc, s->region, s->periodo);
+}
+void printIPC(const void *elem)
+{
+	indices *i = (indices *)elem;
+	printf("%s;%s;%s;%s\n", i->fecha, i->region, i->bienes, i->servicios);
+}
+void printDIV(const void *elem)
+{
+	divisiones *d = (divisiones *)elem;
+	printf("%s;%s;%s;%s;%s\n", d->fecha, d->region, d->grupo, d->desc,
+	       d->indice_ipc);
 }
 // TODO: Solucionar cpyString de mi propia libreria de string
 void formatear(char *c, void *elem)
@@ -119,7 +145,8 @@ void formatear(char *c, void *elem)
 }
 void decodificarFecha(char *fecha)
 {
-	char *cod = "46871 5032";
+	char *cod =
+		"4687195032"; //En el ejercicio no aparece que para el 5 es un 9, pero lo asumo por prueba y error
 	fecha[0] = cod[(int)(*(fecha) - '0')];
 	fecha[1] = cod[(int)(*(fecha + 1) - '0')];
 	fecha[2] = cod[(int)(*(fecha + 2) - '0')];
@@ -129,15 +156,15 @@ void decodificarFecha(char *fecha)
 }
 void formatearFecha(char *c)
 {
-	char meses[12][10] = {
+	char meses[12][11] = {
 		"Enero",      "Febrero", "Marzo",     "Abril",
 		"Mayo",	      "Junio",	 "Julio",     "Agosto",
 		"Septiembre", "Octubre", "Noviembre", "Diciembre"
 	};
 	char mesReg[3];
-	strncpy(mesReg, c + 4, 2);
+	cpyString(mesReg, c + 4, 2);
 	int mes = atoi(mesReg) - 1;
-	//AAAA MM
+	//AAAAMM
 	size_t len = lenString(meses[mes]);
 	char anio[5];
 	strncpy(anio, c, 4);
@@ -239,53 +266,129 @@ void seleccionarRegion(char *region)
 		}
 	} while (opcion < 1 || opcion > 7);
 }
-void clasificarDivisiones(Vector *B, Vector *S, Vector *v)
+void clasificarDivisiones(Vector *D, Vector *v)
 {
-	char **Bienes = malloc(sizeof(char *) * 5);
-	Bienes = (char *[]){ "Alimentos y bebidas no alcoholicas",
-			     "Bebidas alcoholicas y tabaco",
+	char **Bienes = malloc(sizeof(char *) * BIENES);
+	Bienes = (char *[]){ "Alimentos y bebidas no alcohólicas",
+			     "Bebidas alcohólicas y tabaco",
 			     "Prendas de vestir y calzado",
 			     "Bienes y servicios varios",
 			     "Equipamiento y mantenimiento del hogar" };
-	char **Servicios = malloc(sizeof(char *) * 10);
-	Servicios = (char *[]){ "Recreacion y cultura",
-				"Restaurantes y hoteles",
-				"Salud",
-				"Transporte",
-				"Educacion",
-				"Comunicacion",
-				"Vivienda",
-				"agua",
-				"electricidad",
-				"gas y otros combustibles" };
+	char **Servicios = malloc(sizeof(char *) * SERVICIOS);
+	Servicios = (char *[55]){
+		"Recreación y cultura",
+		"Restaurantes y hoteles",
+		"Salud",
+		"Transporte",
+		"Educación",
+		"Comunicación",
+		"Vivienda, agua, electricidad, gas y otros combustibles"
+	};
 	serie_ipc_divisiones *s = NULL;
 	VectorIterador it;
 	vectorIteradorCrear(&it, v);
 	divisiones div;
 	s = (serie_ipc_divisiones *)vectorIteradorPrimero(&it);
 	while (!vectorIteradorFin(&it)) {
-		if (includeString(s->desc, (const char **)Bienes, 5)) {
-			/*
+		bool bienes =
+			includeString(s->desc, (const char **)Bienes, BIENES);
+		bool servicios = includeString(
+			s->desc, (const char **)Servicios, SERVICIOS);
+		if (bienes || servicios) {
 			strcpy(div.desc, s->desc);
 			strcpy(div.indice_ipc, s->indice_ipc);
 			strcpy(div.region, s->region);
 			strcpy(div.fecha, s->periodo);
-			strcpy(div.grupo, "Bienes");
-			vectorInsertar(B, &div);
-			*/
-			printf("Bienes: %s\n", s->desc);
-		} else if (includeString(s->desc, (const char **)Servicios,
-					 10)) {
-			/*
-			strcpy(div.desc, s->desc);
-			strcpy(div.indice_ipc, s->indice_ipc);
-			strcpy(div.region, s->region);
-			strcpy(div.fecha, s->periodo);
-			strcpy(div.grupo, "Servicios");
-			vectorInsertar(S, &div);
-			*/
-			printf("Servicios: %s\n", s->desc);
+			strcpy(div.grupo, bienes ? "Bienes" : "Servicios");
+			vectorInsertar(D, &div);
 		}
 		s = (serie_ipc_divisiones *)vectorIteradorSiguiente(&it);
 	}
+}
+void calcularPromedioMensual(Vector *D)
+{
+	vectorEliminarPorFiltro(D, regNacional);
+	size_t cantPorAnio = (SERVICIOS + BIENES); //12 meses y 7 regiones
+	indices ipc;
+	Vector vIpc;
+	vectorCrear(&vIpc, sizeof(indices));
+	VectorIterador it;
+	vectorIteradorCrear(&it, D);
+	divisiones *div = (divisiones *)vectorIteradorPrimero(&it);
+	strcpy(ipc.fecha, formatearFecha2(div->fecha));
+	strcpy(ipc.region, div->region);
+	strcpy(ipc.bienes, div->indice_ipc);
+	strcpy(ipc.servicios, div->indice_ipc);
+	vectorInsertar(&vIpc, &ipc);
+	div = (divisiones *)vectorIteradorDesplazamiento(&it, cantPorAnio);
+	while (!vectorIteradorFin(&it)) {
+		//Me muevo por regiones hasta encontrar la nacional
+		strcpy(ipc.fecha, formatearFecha2(div->fecha));
+		strcpy(ipc.region, div->region);
+		promedioMensual(it, div->region, div->fecha, &ipc);
+		vectorInsertar(&vIpc, &ipc);
+		div = (divisiones *)vectorIteradorDesplazamiento(&it,
+								 cantPorAnio);
+		//Estoy en la nacional, calculo el promedio y avanzo 12 posiciones
+		//(una por cada mes del año)
+	}
+	vectorMostrar(&vIpc, printIPC);
+
+	return;
+}
+char *formatearFecha2(char *c)
+{
+	char *newFecha = malloc(11 * sizeof(char));
+	char meses[12][11] = {
+		"Enero",      "Febrero", "Marzo",     "Abril",
+		"Mayo",	      "Junio",	 "Julio",     "Agosto",
+		"Septiembre", "Octubre", "Noviembre", "Diciembre"
+	};
+	int i = 0;
+	char *anio = buscarCharEnStringEnReversa(c, '-');
+	*anio = '\0';
+	while (cmpString(c, meses[i]) != 0) {
+		i++;
+	}
+	i++;
+	cpyString(newFecha, anio + 1, 4);
+	*(newFecha + 4) = '-';
+	sprintf(newFecha + 5, "%02d", i);
+	sprintf(newFecha + 7, "-01");
+	newFecha[11] = '\0';
+	return newFecha;
+}
+void promedioMensual(VectorIterador it, char *region, char *fecha,
+		     indices *prom)
+{
+	divisiones *div = (divisiones *)vectorIteradorActual(&it);
+	float sumaBienes = 0;
+	float sumaServicios = 0;
+	int contadorBienes = 0;
+	int contadorServicios = 0;
+	for (int i = 0; i < BIENES + SERVICIOS; i++) {
+		if (cmpString(div->grupo, "Bienes") == 0) {
+			sumaBienes += atof(div->indice_ipc);
+			contadorBienes++;
+		} else if (cmpString(div->grupo, "Servicios") == 0) {
+			sumaServicios += atof(div->indice_ipc);
+			contadorServicios++;
+		}
+		div = (divisiones *)vectorIteradorSiguiente(&it);
+	}
+	if (contadorBienes > 0)
+		sprintf(prom->bienes, "%f", sumaBienes / contadorBienes);
+	else
+		strcpy(prom->bienes, "0");
+	if (contadorServicios > 0)
+		sprintf(prom->servicios, "%f",
+			sumaServicios / contadorServicios);
+	else
+		strcpy(prom->servicios, "0");
+	return;
+}
+int regNacional(const void *elem)
+{
+	divisiones *d = (divisiones *)elem;
+	return cmpString(d->region, "Nacional") == 0;
 }

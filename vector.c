@@ -253,6 +253,27 @@ bool vectorEliminar(Vector *v, void *elem, Cmp cmp)
 	}
 	return eliminado;
 }
+bool vectorEliminarPorFiltro(Vector *v, CmpFil cmp)
+{
+	void *ult = v->vec + (v->cantElem - 1) * v->tamElem;
+	void *i = v->vec;
+	while (i < ult) {
+		if (cmp(i) == 0) {
+			for (void *j = i + v->tamElem; j <= ult;
+			     j += v->tamElem) {
+				memcpy(j - v->tamElem, j, v->tamElem);
+			}
+			ult -= v->tamElem;
+			v->cantElem--;
+		} else {
+			i += v->tamElem;
+		}
+	}
+	if (((float)v->cantElem / v->cap) <= FACT_OCUP) {
+		redimensionarVector(v, FACT_DEC);
+	}
+	return true;
+}
 
 //Ordenamiento
 int vectorOrdenar(Vector *vector, int metodo, Cmp cmp)
@@ -431,6 +452,10 @@ void *vectorIteradorSiguiente(VectorIterador *it)
 void *vectorIteradorDesplazamiento(VectorIterador *it, size_t cantidad)
 {
 	const Vector *v = it->vector;
+	if (it->act + v->tamElem * cantidad > it->ult) {
+		it->finIter = true;
+		return NULL;
+	}
 	char *cur = it->act + v->tamElem * cantidad;
 
 	if (cur < (char *)v->vec || cur > (char *)it->ult)
@@ -443,4 +468,8 @@ void *vectorIteradorDesplazamiento(VectorIterador *it, size_t cantidad)
 bool vectorIteradorFin(VectorIterador *it)
 {
 	return it->finIter;
+}
+void *vectorIteradorActual(VectorIterador *it)
+{
+	return it->act;
 }

@@ -1,25 +1,28 @@
 # depslib dependency file v1.0
-1760309283 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/string.c
+1760618122 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/string.c
+	"includes/string.h"
 	<stddef.h>
 	<stdio.h>
 	"string.h"
 
-1760314015 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/main.c
+1760626842 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/main.c
+	<stddef.h>
 	<stdio.h>
 	<string.h>
 	<stdlib.h>
 	"includes/string.h"
 	"includes/vector.h"
 
-1760309006 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/string.h
+1760611884 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/string.h
 	<stddef.h>
+	<stdbool.h>
 
-1760310055 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/vector.h
+1760626247 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/vector.h
 	<stdbool.h>
 	<stddef.h>
 	<stdio.h>
 
-1760311132 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/vector.c
+1760626239 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/vector.c
 	<stddef.h>
 	"includes/vector.h"
 	"includes/string.h"
