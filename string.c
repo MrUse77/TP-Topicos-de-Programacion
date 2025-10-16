@@ -1,3 +1,4 @@
+#include "includes/string.h"
 #include <stddef.h>
 #include <stdio.h>
 #include "string.h"
@@ -15,6 +16,7 @@ size_t lenString(const char *str)
 	}
 	return len;
 }
+
 // Retorna 0 si son iguales, <0 si str1 < str2, >0 si str1 > str2
 int cmpString(const char *str1, const char *str2)
 {
@@ -136,13 +138,28 @@ char *reemplazarCharEnString(char *str, const char buscar,
 char *normarlizarString(char *str)
 {
 	char *i = str;
+	*i = aMayus(*i);
+	i++;
 	while (*i) {
 		if (esLetra(*i)) {
-			if (*(i - 1) == ' ') {
+			if (*(i - 1) == ' ')
 				*i = aMayus(*i);
-			} else {
+			else
 				*i = aMinus(*i);
-			}
+		}
+		i++;
+	}
+	return str;
+}
+char *normarlizarPrimerChar(char *str)
+{
+	char *i = str;
+	*i = aMayus(*i);
+
+	i++;
+	while (*i) {
+		if (esLetra(*i)) {
+			*i = aMinus(*i);
 		}
 		i++;
 	}
@@ -158,4 +175,16 @@ char *removerCharEnString(char *str, char c)
 	}
 	*dst = '\0';
 	return str; // Retorna la cadena con los caracteres removidos
+}
+
+bool includeString(const char *str, const char **arr, size_t size)
+{
+	const char **ult = arr + size;
+	while (arr < ult) {
+		if (cmpString(str, *arr) == 0) {
+			return true;
+		}
+		arr++;
+	}
+	return false;
 }

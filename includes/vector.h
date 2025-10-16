@@ -48,7 +48,6 @@ typedef void (*Fmt)(const void *);
 typedef void (*FmtInsert)(char *, void *);
 typedef void (*FmtRead)(char *, void *);
 typedef void (*FmtWrite)(FILE *, void *);
-extern double tiempo;
 
 //memmove: usar cuando entre destino y origen tocan una misma direccion de memoria, usa un buffer
 //memcpy: usar cuando entre destino y origen no tocan una misma direccion de memoria, no usa un buffer

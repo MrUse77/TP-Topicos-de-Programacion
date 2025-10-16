@@ -8,15 +8,35 @@
 
 typedef struct {
 	char code[21];
-	char desc[31];
-	char clasificador[31];
+	char desc[35];
+	char clasificador[35];
 	char indice_ipc[17];
 	char v_m_ipc[17];
 	char v_a_ipc[17];
 	char region[10];
 	char periodo[17]; //AAAAMM
-} serie_ipc;
+} serie_ipc_divisiones;
+typedef struct {
+	char fecha[11]; //AAAA-MM-DD
+	char desc[35];
+	char indice_ipc[17];
+	char region[10];
+	char grupo[10];
+} divisiones;
+typedef struct {
+	int monto;
+	char region[10];
+	char fechaDesde[17];
+	char fechaHasta[17];
+} filtroIPC;
 
+void clasificarDivisiones(Vector *B, Vector *S, Vector *v);
+void normalizar(char *c);
+void seleccionarRegion(char *region);
+void calcularIPC(char *sDesde, char *sHasta, int monto);
+int aplicarFiltro(const void *elem, const void *filtro);
+void menu(filtroIPC *f);
+void generarHerramienta(filtroIPC filtro, Vector *v);
 void print(const void *elem);
 void decodificarFecha(char *fecha);
 void formatear(char *c, void *elem);
@@ -30,17 +50,21 @@ int main()
 	}
 	int code = 0;
 	Vector v;
-	VectorIterador it;
-	code = vectorCrear(&v, sizeof(serie_ipc));
-	vectorIteradorCrear(&it, &v);
-	code = vectorInsertarDeArchivoTXT(&v, f, formatear, 2);
-
-	serie_ipc *s = (serie_ipc *)vectorIteradorPrimero(&it);
-	while (!vectorIteradorFin(&it)) {
-		formatearFecha(s->periodo);
-		s = (serie_ipc *)vectorIteradorSiguiente(&it);
+	code = vectorCrear(&v, sizeof(serie_ipc_divisiones));
+	if (code != OK) {
+		return code;
 	}
-	vectorMostrar(&v, print);
+	code = vectorInsertarDeArchivoTXT(&v, f, formatear, 0);
+	if (code != OK) {
+		return code;
+	}
+	//filtroIPC filtro;
+	//menu(&filtro);
+	//generarHerramienta(filtro, &v);
+	Vector Bienes, Servicios;
+	vectorCrear(&Bienes, sizeof(divisiones));
+	vectorCrear(&Servicios, sizeof(divisiones));
+	clasificarDivisiones(&Bienes, &Servicios, &v);
 
 	vectorDestruir(&v);
 	return code;
@@ -48,22 +72,21 @@ int main()
 
 void print(const void *elem)
 {
-	serie_ipc *s = (serie_ipc *)elem;
+	serie_ipc_divisiones *s = (serie_ipc_divisiones *)elem;
 	printf("%s;%s;%s;%s;%s;%s;%s;%s\n", s->code, s->desc, s->clasificador,
 	       s->indice_ipc, s->v_m_ipc, s->v_a_ipc, s->region, s->periodo);
 }
 // TODO: Solucionar cpyString de mi propia libreria de string
 void formatear(char *c, void *elem)
 {
-	serie_ipc *s = (serie_ipc *)elem;
+	serie_ipc_divisiones *s = (serie_ipc_divisiones *)elem;
 
 	char *act = buscarCharEnStringEnReversa(c, '\n');
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
-	char aux[17];
-	strcpy(aux, act + 1);
-	formatearFecha(aux);
-	strcpy(s->periodo, aux);
+	strcpy(s->periodo, act + 1);
+	decodificarFecha(s->periodo);
+	formatearFecha(s->periodo);
 
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
@@ -80,6 +103,7 @@ void formatear(char *c, void *elem)
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
 	strcpy(s->indice_ipc, act + 1);
+	reemplazarCharEnString(s->indice_ipc, ',', '.');
 
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
@@ -88,6 +112,7 @@ void formatear(char *c, void *elem)
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
 	strcpy(s->desc, act + 1);
+	normarlizarPrimerChar(s->desc);
 
 	*act = '\0';
 	strcpy(s->code, c);
@@ -109,7 +134,6 @@ void formatearFecha(char *c)
 		"Mayo",	      "Junio",	 "Julio",     "Agosto",
 		"Septiembre", "Octubre", "Noviembre", "Diciembre"
 	};
-	decodificarFecha(c);
 	char mesReg[3];
 	strncpy(mesReg, c + 4, 2);
 	int mes = atoi(mesReg) - 1;
@@ -122,4 +146,146 @@ void formatearFecha(char *c)
 	c += len;
 	*c = '-';
 	strcpy(c + 1, anio);
+}
+void menu(filtroIPC *f)
+{
+	printf("Ingrese un monto expresado en pesos: ");
+	scanf("%d", &f->monto);
+	printf("Seleccione la region: \n");
+	printf("1. Nacional\n");
+	printf("2. GBA\n");
+	printf("3. Pampeana\n");
+	printf("4. Cuyo\n");
+	printf("5. Noroeste\n");
+	printf("6. Noreste\n");
+	printf("7. Patagonia\n");
+	seleccionarRegion(f->region);
+	printf("Ingrese una fecha desde (AAAAMM): ");
+	scanf(" %s", f->fechaDesde);
+	printf("Ingrese una fecha hasta (AAAAMM): ");
+	scanf(" %s", f->fechaHasta);
+}
+void generarHerramienta(filtroIPC filtro, Vector *v)
+{
+	serie_ipc_divisiones *s;
+	VectorIterador it;
+	vectorIteradorCrear(&it, v);
+	s = (serie_ipc_divisiones *)vectorIteradorPrimero(&it);
+	int encontrados = 0;
+	char sDesde[17], sHasta[17];
+
+	formatearFecha((char *)filtro.fechaDesde);
+	formatearFecha((char *)filtro.fechaHasta);
+	while (!vectorIteradorFin(&it) && encontrados != 2) {
+		if (cmpString(s->desc, "Nivel general") == 0 &&
+		    cmpString(s->region, filtro.region) == 0) {
+			if (cmpString(s->periodo, filtro.fechaDesde) == 0) {
+				printf("Encontrado desde: %s\n", s->periodo);
+				strcpy(sDesde, s->indice_ipc);
+				encontrados++;
+			} else if (cmpString(s->periodo, filtro.fechaHasta) ==
+				   0) {
+				printf("Encontrado hasta: %s\n", s->periodo);
+				strcpy(sHasta, s->indice_ipc);
+				encontrados++;
+			}
+		}
+		s = (serie_ipc_divisiones *)vectorIteradorSiguiente(&it);
+	}
+	puts(sDesde);
+	puts(sHasta);
+	calcularIPC(sDesde, sHasta, filtro.monto);
+}
+void calcularIPC(char *sDesde, char *sHasta, int monto)
+{
+	float pDesde = atof(sDesde);
+	float pHasta = atof(sHasta);
+	float montoAjustado = monto * (pHasta / pDesde);
+	float variacion = (pHasta / pDesde - 1) * 100;
+	printf("El monto ajustado con una variacion del %f%% es de: %f",
+	       variacion, montoAjustado);
+}
+void seleccionarRegion(char *region)
+{
+	int opcion = 0;
+	do {
+		printf("Ingrese una opcion (1-7): ");
+		scanf("%d", &opcion);
+		switch (opcion) {
+		case 1:
+			strcpy(region, "Nacional");
+			break;
+		case 2:
+			strcpy(region, "GBA");
+			break;
+		case 3:
+			strcpy(region, "Pampeana");
+			break;
+		case 4:
+			strcpy(region, "Cuyo");
+			break;
+		case 5:
+			strcpy(region, "Noroeste");
+			break;
+		case 6:
+			strcpy(region, "Noreste");
+			break;
+		case 7:
+			strcpy(region, "Patagonia");
+			break;
+		default:
+			printf("Opcion invalida. Intente de nuevo.\n");
+			break;
+		}
+	} while (opcion < 1 || opcion > 7);
+}
+void clasificarDivisiones(Vector *B, Vector *S, Vector *v)
+{
+	char **Bienes = malloc(sizeof(char *) * 5);
+	Bienes = (char *[]){ "Alimentos y bebidas no alcoholicas",
+			     "Bebidas alcoholicas y tabaco",
+			     "Prendas de vestir y calzado",
+			     "Bienes y servicios varios",
+			     "Equipamiento y mantenimiento del hogar" };
+	char **Servicios = malloc(sizeof(char *) * 10);
+	Servicios = (char *[]){ "Recreacion y cultura",
+				"Restaurantes y hoteles",
+				"Salud",
+				"Transporte",
+				"Educacion",
+				"Comunicacion",
+				"Vivienda",
+				"agua",
+				"electricidad",
+				"gas y otros combustibles" };
+	serie_ipc_divisiones *s = NULL;
+	VectorIterador it;
+	vectorIteradorCrear(&it, v);
+	divisiones div;
+	s = (serie_ipc_divisiones *)vectorIteradorPrimero(&it);
+	while (!vectorIteradorFin(&it)) {
+		if (includeString(s->desc, (const char **)Bienes, 5)) {
+			/*
+			strcpy(div.desc, s->desc);
+			strcpy(div.indice_ipc, s->indice_ipc);
+			strcpy(div.region, s->region);
+			strcpy(div.fecha, s->periodo);
+			strcpy(div.grupo, "Bienes");
+			vectorInsertar(B, &div);
+			*/
+			printf("Bienes: %s\n", s->desc);
+		} else if (includeString(s->desc, (const char **)Servicios,
+					 10)) {
+			/*
+			strcpy(div.desc, s->desc);
+			strcpy(div.indice_ipc, s->indice_ipc);
+			strcpy(div.region, s->region);
+			strcpy(div.fecha, s->periodo);
+			strcpy(div.grupo, "Servicios");
+			vectorInsertar(S, &div);
+			*/
+			printf("Servicios: %s\n", s->desc);
+		}
+		s = (serie_ipc_divisiones *)vectorIteradorSiguiente(&it);
+	}
 }

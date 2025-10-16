@@ -29,3 +29,35 @@
 	<string.h>
 	<time.h>
 
+1760584958 source:/home/agustin/Documentos/unlam/Topicos/TP/string.c
+	"includes/string.h"
+	<stddef.h>
+	<stdio.h>
+	"string.h"
+
+1760583452 source:/home/agustin/Documentos/unlam/Topicos/TP/vector.c
+	<stddef.h>
+	"includes/vector.h"
+	"includes/string.h"
+	<stdlib.h>
+	<stdio.h>
+	<unistd.h>
+	<string.h>
+	<time.h>
+
+1760583457 /home/agustin/Documentos/unlam/Topicos/TP/includes/vector.h
+	<stdbool.h>
+	<stddef.h>
+	<stdio.h>
+
+1760584969 /home/agustin/Documentos/unlam/Topicos/TP/includes/string.h
+	<stddef.h>
+	<stdbool.h>
+
+1760585131 source:/home/agustin/Documentos/unlam/Topicos/TP/main.c
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	"includes/string.h"
+	"includes/vector.h"
+

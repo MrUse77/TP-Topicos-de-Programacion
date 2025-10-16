@@ -20,6 +20,13 @@ static bool redimensionarVector(Vector *v, float factor);
 ordenamiento metodos[] = { NULL, ordenarBurbujeo, ordenarInsercion,
 			   ordenarSeleccion, ordenarSeleccion2 };
 
+void *vectorGet(const Vector *v, size_t pos)
+{
+	if (pos < 0 || pos >= v->cantElem)
+		return NULL;
+	return v->vec + pos * v->tamElem;
+}
+
 //Creacion
 int vectorCrear(Vector *v, size_t tam)
 {
@@ -119,7 +126,7 @@ int vectorInsertarDeArchivoBIN(Vector *v, FILE *f)
 	free(elem);
 	return cod;
 }
-//La cabecera de, por ejemplo un csv, debera leerse antes de llamar a esta funcion
+//La cabecera de, por ejemplo un csv, NO SE GUARDARA
 int vectorInsertarDeArchivoTXT(Vector *v, FILE *f, FmtInsert formatear,
 			       int count)
 {
@@ -408,13 +415,13 @@ void *vectorIteradorSiguiente(VectorIterador *it)
 {
 	Vector *v = it->vector;
 
-	char *siguiente = it->act + v->tamElem;
+	void *siguiente = it->act + v->tamElem;
 
-	if (siguiente > (char *)it->ult) {
+	if (siguiente > it->ult) {
 		it->finIter = true;
 		return NULL;
 
-	} else if (siguiente <= (char *)v->vec)
+	} else if (siguiente <= v->vec)
 		return NULL;
 
 	it->act = siguiente;
