@@ -34,6 +34,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="divisiones.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="includes/divisiones.h" />
 		<Unit filename="includes/string.h" />
 		<Unit filename="includes/vector.h" />
 		<Unit filename="main.c">

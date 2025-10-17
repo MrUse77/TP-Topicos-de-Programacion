@@ -35,7 +35,19 @@ int cmpString(const char *str1, const char *str2)
 	}
 	return diff;
 }
-char *cpyString(char *dest, const char *src, size_t lim)
+char *cpyNString(char *dest, const char *src, size_t lim)
+{
+	char *cActualDest = dest;
+	const char *cActualSrc = src;
+	while (*cActualSrc != '\0' && (cActualDest - dest < lim)) {
+		*cActualDest = *cActualSrc;
+		cActualDest++;
+		cActualSrc++;
+	}
+	*cActualDest = '\0'; // Asegura que la cadena destino termine con null
+	return dest; // Retorna la longitud de la cadena copiada
+}
+char *cpyString(char *dest, const char *src)
 {
 	char *cActualDest = dest;
 	const char *cActualSrc = src;
@@ -44,6 +56,7 @@ char *cpyString(char *dest, const char *src, size_t lim)
 		cActualDest++;
 		cActualSrc++;
 	}
+	*cActualDest = '\0'; // Asegura que la cadena destino termine con null
 	return dest; // Retorna la longitud de la cadena copiada
 }
 char *catString(char *dest, const char *src, size_t lim)
@@ -176,14 +189,21 @@ char *removerCharEnString(char *str, char c)
 	*dst = '\0';
 	return str; // Retorna la cadena con los caracteres removidos
 }
+size_t lenArrayString(const char **arr)
+{
+	size_t len = 0;
+	while (*arr != NULL) {
+		len++;
+		arr++;
+	}
+	return len;
+}
 bool includeString(const char *str, const char **arr, size_t size)
 {
-	const char **ult = arr + size - 1;
-	while (arr <= ult) {
-		if (cmpString(str, *arr) == 0) {
+	for (size_t i = 0; i < size; i++) {
+		if (cmpString(str, arr[i]) == 0) {
 			return true;
 		}
-		arr++;
 	}
 	return false;
 }

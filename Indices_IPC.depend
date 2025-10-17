@@ -1,28 +1,29 @@
 # depslib dependency file v1.0
-1760618122 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/string.c
+1760693933 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/string.c
 	"includes/string.h"
 	<stddef.h>
 	<stdio.h>
 	"string.h"
 
-1760626842 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/main.c
+1760650663 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/main.c
 	<stddef.h>
 	<stdio.h>
-	<string.h>
 	<stdlib.h>
 	"includes/string.h"
 	"includes/vector.h"
+	"includes/divisiones.h"
 
-1760611884 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/string.h
+1760693760 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/string.h
 	<stddef.h>
 	<stdbool.h>
+	<string.h>
 
-1760626247 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/vector.h
+1760627505 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/vector.h
 	<stdbool.h>
 	<stddef.h>
 	<stdio.h>
 
-1760626239 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/vector.c
+1760627505 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/vector.c
 	<stddef.h>
 	"includes/vector.h"
 	"includes/string.h"
@@ -63,4 +64,16 @@
 	<stdlib.h>
 	"includes/string.h"
 	"includes/vector.h"
+
+1760694048 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/divisiones.c
+	"includes/string.h"
+	"includes/divisiones.h"
+	"includes/vector.h"
+
+1760650484 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/divisiones.h
+	<stdlib.h>
+	<stddef.h>
+	<stdbool.h>
+	"string.h"
+	"vector.h"
 

@@ -2,6 +2,7 @@
 #define STRING_H
 #include <stddef.h>
 #include <stdbool.h>
+#include <string.h>
 
 /*
 * Esta libreria usara como base algunas funciones hechas desde 0 de string.h
@@ -10,7 +11,8 @@
 
 size_t lenString(const char *str);
 int cmpString(const char *str1, const char *str2);
-char *cpyString(char *dest, const char *src, size_t lim);
+char *cpyNString(char *dest, const char *src, size_t lim);
+char *cpyString(char *dest, const char *src);
 char *removerCharEnString(char *str, char c);
 char *normarlizarString(char *str);
 char *reemplazarCharEnString(char *str, const char buscar,
