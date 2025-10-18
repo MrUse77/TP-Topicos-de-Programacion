@@ -1,9 +1,16 @@
 #include "vector.h"
+#include "iterador.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
+
+#define ELEMS 10
 
 int compararEmpleado(void* emplA, void* emplB);
 void mostrarEmpleado(void* empleado);
+
+int compararInt(void* intA, void* intB);
+void mostrarInt(void* n);
 
 typedef struct{
     char nomApe[50];
@@ -12,35 +19,47 @@ typedef struct{
     double sueldo;
 }Empleado;
 
+Empleado generarEmpleadoAleatorio(void);
+
 int main()
 {
-    Vector_t vecA, vecB, vecC;
+    Vector_t vecA;
+
+    srand(1);
+
+    Empleado tmp;
+    Empleado* ptr;
 
     vectorCrear(&vecA, sizeof(Empleado));
 
-    Empleado emp1 = {"Juan Perez", "Sistemas", 1234, 55000};
-    Empleado emp2 = {"Ana Gomez", "Sistemas", 5678, 60000};
-    Empleado emp3 = {"Luis Martinez", "Ventas", 9101, 45000};
-    Empleado emp4 = {"Maria Lopez", "Ventas", 1121, 47000};
-    Empleado emp5 = {"Carlos Sanchez", "RRHH", 3141, 52000};
-    Empleado emp6 = {"Laura Fernandez", "RRHH", 5161, 53000};
-    Empleado emp7 = {"Pedro Alvarez", "Sistemas", 7181, 58000};
+    for(int i = 0; i < ELEMS; i++){
+        tmp = generarEmpleadoAleatorio();
+        vectorEmpujar(&vecA, &tmp);
+    }
+    
+    int seg_ini = time(NULL);
 
-    vectorInsertarOrd(&vecA, &emp1, compararEmpleado);
-    vectorInsertarOrd(&vecA, &emp2, compararEmpleado);
-    vectorInsertarOrd(&vecA, &emp3, compararEmpleado);
-    vectorInsertarOrd(&vecA, &emp4, compararEmpleado);
-    vectorInsertarOrd(&vecA, &emp5, compararEmpleado);
-    vectorInsertarOrd(&vecA, &emp6, compararEmpleado);
-    vectorInsertarOrd(&vecA, &emp7, compararEmpleado);
+    vectorOrdenar(&vecA, compararEmpleado);
 
-    mostrarVector(&vecA, mostrarEmpleado);
+    Iterador_t iterA;
 
-    vectorEliminarPos(&vecA, 0);
+    iteradorCrear(&iterA, &vecA);
 
-    puts("");
+    while((ptr = iteradorSiguiente(&iterA))){
+        mostrarEmpleado(ptr);
+    }
 
-    mostrarVector(&vecA, mostrarEmpleado);
+    iteradorMoverCursor(&iterA, -2, ITER_FIN);
+
+    while((ptr = iteradorSiguiente(&iterA))){
+        mostrarEmpleado(ptr);
+    }
+
+    iteradorDestruir(&iterA);
+
+    int seg_fin = time(NULL);
+
+    printf("%d\n", seg_fin - seg_ini);
 
     vectorDestruir(&vecA);
 
@@ -60,4 +79,42 @@ int compararEmpleado(void* emplA, void* emplB)
     Empleado* tmpB = (Empleado*) emplB;
 
     return (tmpA->legajo - tmpB->legajo);
+}
+
+int compararInt(void* intA, void* intB)
+{
+    return (*(long*)intA - *(long*)intB);
+}
+
+void mostrarInt(void* n)
+{
+    printf("[%02ld]\n", *(long*)n);
+}
+
+Empleado generarEmpleadoAleatorio() {
+    // Datos de prueba
+    const char* nombres[] = {"Ana", "Juan", "Pedro", "Lucia", "Sofia", "Carlos", "Maria", "Luis"};
+    const char* apellidos[] = {"Gomez", "Perez", "Fernandez", "Lopez", "Diaz", "Martinez", "Ruiz", "Sanchez"};
+    const char* departamentos[] = {"Ventas", "Recursos Humanos", "IT", "Marketing", "Finanzas", "Logistica"};
+
+    int cantNombres = sizeof(nombres) / sizeof(nombres[0]);
+    int cantApellidos = sizeof(apellidos) / sizeof(apellidos[0]);
+    int cantDeptos = sizeof(departamentos) / sizeof(departamentos[0]);
+
+    Empleado e;
+
+    // Generar nombre y apellido combinados
+    snprintf(e.nomApe, sizeof(e.nomApe), "%s %s",
+             nombres[rand() % cantNombres], apellidos[rand() % cantApellidos]);
+
+    // Departamento
+    strcpy(e.departamento, departamentos[rand() % cantDeptos]);
+
+    // Legajo (ejemplo entre 1000 y 9999)
+    e.legajo = 1000 + rand() % 9000;
+
+    // Sueldo (ejemplo entre 50,000 y 200,000)
+    e.sueldo = 50000 + (rand() % 150001);
+
+    return e;
 }

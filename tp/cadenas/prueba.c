@@ -3,7 +3,7 @@
 #include <string.h>
 
 int main()
-{
+{/*
     char a[] = "Hello, World";
     char g[] = "Hello, World";
     char z[] = "01234abcd";
@@ -35,6 +35,7 @@ int main()
     //printf("%s\n", stringSubstring(frase, pal));
 
     printf("%s\n", stringReverse(b));
+    */
 
     return 0;
 }

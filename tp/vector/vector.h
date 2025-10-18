@@ -1,20 +1,24 @@
 #ifndef VECTOR_INCLUDED
 #define VECTOR_INCLUDED
 
+/// @file vector.h
+/// @brief Header con las principales funcionalidades del TDA Vector
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h> 
 #include <memory.h>
 #include <stddef.h>
+#include "../comunes/comunes.h"
 
 #define FACTOR_INCR 2
 
 #define DEFAULT_CAP 10
 
-#define EXITO 0
-#define ERR_SIN_MEM 1
-#define ERR_INPUT 2
-
+/**
+ *  @struct Vector_t
+ *  @brief Struct del TDA Vector
+ */
 typedef struct vector
 {
     void* data;
@@ -22,6 +26,11 @@ typedef struct vector
     size_t tamElem;
     size_t capacidad;    
 }Vector_t;
+
+int transform(Vector_t* vector, int (*Mapear)(void*));
+Vector_t* map(Vector_t* vector, void* (*Mapear)(void*), size_t n);
+Vector_t* filter(Vector_t* vector, int (*Predicado)(void*, void*), void* contexto);
+void* reduce(Vector_t* vector, void* (*Reductor)(void*, void*));
 
 int vectorCrear(Vector_t* vector, size_t tamElem);
 int vectorDestruir(Vector_t* vector);
@@ -33,6 +42,8 @@ int vectorEscribirATexto(Vector_t* vector, const char* nomArch, int (*ParsearTxt
 
 int vectorLeerDeBinario(Vector_t* vector, const char* nomArch);
 int vectorEscribirABinario(Vector_t* vector, const char* nomArch);
+
+void* vectorObtener(Vector_t* vector, size_t pos);
 
 int vectorInsertar(Vector_t* vector, size_t pos, void* elem);
 int vectorEmpujar(Vector_t* vector, void* elem);
