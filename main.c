@@ -14,6 +14,9 @@ typedef struct {
 	char fechaHasta[10];
 } serie_ipc_aperturas;
 char *formatearFecha2(char *c);
+int compararFechas(const char *f1, const char *f2);
+int cmpDivisionesPorFechaRegionYDiv(const void *a, const void *b);
+bool filtrarDivisiones(const void *elem, char *grupo);
 int regNacional(const void *elem);
 void print(const void *elem);
 void decodificarFecha(char *fecha);
@@ -47,25 +50,15 @@ int main()
 	//menu(&filtro);
 	//generarHerramienta(filtro, &v);
 
-	Vector Servicios, Bienes;
-	const char *codeB[5] = { "01", "02", "03", "12", "05" };
-	const char *codeS[7] = { "04", "06", "07", "08", "09", "10", "11" };
-	vectorCrear(&Servicios, sizeof(divisiones));
-	vectorCrear(&Bienes, sizeof(divisiones));
-	clasificarDivisiones(&Bienes, &v, (const char **)codeB,
-			     sizeof(codeB) / sizeof(codeB[0]), "Bienes");
-	clasificarDivisiones(&Servicios, &v, (const char **)codeS,
-			     sizeof(codeS) / sizeof(codeS[0]), "Servicios");
-	vectorEliminarPorFiltro(&Servicios, regNacional);
-	vectorEliminarPorFiltro(&Bienes, regNacional);
-	/*
-	printf("BIENES\n");
-	vectorMostrar(&Bienes, printDIV);
-	printf("SERVICIOS\n");
-	vectorMostrar(&Servicios, printDIV);
-	*/
-	vectorMostrar(&Bienes, printDIV);
-	calcularPromedioMensual(&Servicios, &Bienes, printIPC);
+	Vector Divisiones;
+	vectorCrear(&Divisiones, sizeof(divisiones));
+	clasificarDivisiones(&Divisiones, &v, filtrarDivisiones,
+			     cmpDivisionesPorFechaRegionYDiv);
+	//vectorEliminarPorFiltro(&Servicios, regNacional);
+	//vectorEliminarPorFiltro(&Bienes, regNacional);
+	//vectorMostrar(&Divisiones, printDIV);
+	calcularPromedios(&Divisiones, printIPC);
+	vectorDestruir(&Divisiones);
 
 	FILE *f2 = fopen(IPC_AP, "r");
 	if (!f2) {
@@ -75,18 +68,16 @@ int main()
 	vectorDestruir(&v);
 	vectorCrear(&v, sizeof(serie_ipc_aperturas));
 	if (code != OK) {
-		fclose(f);
+		fclose(f2);
 		return code;
 	}
-	code = vectorInsertarDeArchivoTXT(&v, f2, formatearAperturas, 0);
+	//code = vectorInsertarDeArchivoTXT(&v, f2, formatearAperturas, 0);
 	if (code != OK) {
-		fclose(f);
+		fclose(f2);
 		vectorDestruir(&v);
 		return code;
 	}
-
-	vectorDestruir(&Bienes);
-	vectorDestruir(&Servicios);
+	fclose(f2);
 	return code;
 }
 
@@ -169,26 +160,76 @@ int regNacional(const void *elem)
 	divisiones *d = (divisiones *)elem;
 	return cmpString(d->region, "Nacional") == 0;
 }
-/*
+bool filtrarDivisiones(const void *elem, char *grupo)
+{
+	const char *codeB[5] = { "01", "02", "03", "12", "05" };
+	const char *codeS[7] = { "04", "06", "07", "08", "09", "10", "11" };
+	if (includeString(((serie_ipc_divisiones *)elem)->code, codeB, 5)) {
+		cpyString(grupo, "Bienes");
+		return true;
+	} else if (includeString(((serie_ipc_divisiones *)elem)->code, codeS,
+				 7)) {
+		cpyString(grupo, "Servicios");
+		return true;
+	}
+	return false;
+}
+int cmpDivisionesPorFechaRegionYDiv(const void *a, const void *b)
+{
+	divisiones *d1 = (divisiones *)a;
+	divisiones *d2 = (divisiones *)b;
+	char *f1 = formatearFecha2(d1->fecha);
+	char *f2 = formatearFecha2(d2->fecha);
+	int res = cmpString(f2, f1);
+	free(f1);
+	free(f2);
+	if (res == 0) {
+		res = cmpString(d1->region, d2->region);
+		if (res != 0) {
+			return res;
+		}
+		return cmpString(d1->grupo, d2->grupo);
+	}
+	return res;
+}
+int compararFechas(const char *f1, const char *f2)
+{
+	//Formato MMMMMMMM-AAAA
+	const char *mes1 = buscarCharEnStringEnReversa(f1, '-');
+	const char *mes2 = buscarCharEnStringEnReversa(f2, '-');
+
+	int cmpAnio = cmpString(mes1 + 1, mes2 + 1);
+	if (cmpAnio != 0) {
+		return cmpAnio;
+	}
+
+	// Compare months using length difference
+	size_t len1 = mes1 - f1;
+	size_t len2 = mes2 - f2;
+	if (len1 != len2) {
+		return (len1 > len2) ? 1 : -1;
+	}
+
+	return cmpNString(f1, f2, len1);
+}
+
 char *formatearFecha2(char *c)
 {
-	char *newFecha = malloc(11 * sizeof(char));
+	char *newFecha = malloc(7 * sizeof(char));
 	char meses[12][11] = {
 		"Enero",      "Febrero", "Marzo",     "Abril",
+		"Mayo",	      "Junio",	 "Julio",     "Agosto",
 		"Septiembre", "Octubre", "Noviembre", "Diciembre"
 	};
 	int i = 0;
 	char *anio = buscarCharEnStringEnReversa(c, '-');
-	*anio = '\0';
-	while (cmpString(c, meses[i]) != 0) {
+	size_t len1 = anio - c;
+	while (c && cmpNString(c, meses[i], len1) != 0) {
 		i++;
 	}
 	i++;
-	cpyString(newFecha, anio + 1, 4);
-	*(newFecha + 4) = '-';
-	sprintf(newFecha + 5, "%02d", i);
-	sprintf(newFecha + 7, "-01");
-	newFecha[11] = '\0';
+	cpyNString(newFecha, anio + 1, 4);
+	sprintf(newFecha + 4, "%02d", i);
+	newFecha[6] = '\0';
 	return newFecha;
 }
-*/

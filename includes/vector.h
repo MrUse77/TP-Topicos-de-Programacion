@@ -71,6 +71,7 @@ int vectorGuardarAArchivoTXT(Vector *v, FILE *f, FmtWrite formatear);
 //Busqueda
 void *vectorBuscar(Vector *v, int elem);
 void *vectorOrdBuscar(const Vector *v, void *elem, Cmp cmp);
+void *vectorGet(const Vector *v, size_t pos);
 
 //Eliminacion
 bool vectorOrdEliminar(Vector *v, void *elem, Cmp cmp);

@@ -2,6 +2,9 @@
 #include "includes/divisiones.h"
 #include "includes/vector.h"
 
+int buscarIndiceEnVector(Vector *v, char *fecha, char *region);
+int cmpDivisionesPorFechaYRegion(const void *a, const void *b);
+int promedioMensual(VectorIterador *it, indices *ipc, divisiones *d);
 void calcularIPC(char *sDesde, char *sHasta, int monto);
 void formatearFecha(char *c);
 void seleccionarRegion(char *region);
@@ -55,50 +58,70 @@ void menu(filtroIPC *f)
 	printf("Ingrese una fecha hasta (AAAAMM): ");
 	scanf(" %s", f->fechaHasta);
 }
-void calcularPromedioMensual(Vector *S, Vector *B, Fmt print)
+void calcularPromedios(Vector *D, Fmt print)
 {
-	Vector vIpc;
+	Vector vAc, vIpc;
+	vectorCrear(&vAc, sizeof(acumuladorRegion));
 	vectorCrear(&vIpc, sizeof(indices));
+	VectorIterador it;
+	vectorIteradorCrear(&it, D);
+	divisiones *d = (divisiones *)vectorIteradorPrimero(&it);
+	vectorIteradorPrimero(&it);
 
-	VectorIterador itB, itS;
-	vectorIteradorCrear(&itB, B);
-	vectorIteradorCrear(&itS, S);
-	divisiones *b = (divisiones *)vectorIteradorPrimero(&itB);
-	divisiones *s = (divisiones *)vectorIteradorPrimero(&itS);
-	char fechaActualB[18];
-	char fechaActualS[18];
-	while (!vectorIteradorFin(&itB) && !vectorIteradorFin(&itS)) {
-		cpyString(fechaActualB, b->fecha);
-		cpyString(fechaActualS, s->fecha);
-		float sumaB = 0, sumaS = 0;
-		int countB = 0, countS = 0;
-		indices ipc;
-		cpyString(ipc.fecha, b->fecha);
-		cpyString(ipc.region, b->region);
-		while (b && strcmp(b->fecha, fechaActualB) == 0) {
-			countB++;
-			sumaB += atof(b->indice_ipc);
-			b = (divisiones *)vectorIteradorSiguiente(&itB);
+	while (!vectorIteradorFin(&it)) {
+		int pos = buscarIndiceEnVector(&vAc, d->fecha, d->region);
+		acumuladorRegion *ac = (acumuladorRegion *)vectorGet(&vAc, pos);
+		float val = atof(d->indice_ipc);
+		if (cmpString(d->grupo, "Bienes") == 0) {
+			ac->bienes += val;
+			ac->cantidadB++;
+		} else if (cmpString(d->grupo, "Servicios") == 0) {
+			ac->servicios += val;
+			ac->cantidadS++;
 		}
-		while (s && strcmp(s->fecha, fechaActualS) == 0) {
-			countS++;
-			sumaS += atof(s->indice_ipc);
-			s = (divisiones *)vectorIteradorSiguiente(&itS);
-		}
-		promedio(B, &ipc.bienes, sumaB, countB);
-		promedio(S, &ipc.servicios, sumaS, countS);
+		d = (divisiones *)vectorIteradorSiguiente(&it);
+	}
+
+	vectorIteradorCrear(&it, &vAc);
+	acumuladorRegion *ac = (acumuladorRegion *)vectorIteradorPrimero(&it);
+
+	while (!vectorIteradorFin(&it)) {
+		indices ipc = { 0 };
+		cpyString(ipc.fecha, ac->fecha);
+		cpyString(ipc.region, ac->region);
+		ipc.bienes = ac->cantidadB > 0 ? ac->bienes / ac->cantidadB : 0;
+		ipc.servicios =
+			ac->cantidadS > 0 ? ac->servicios / ac->cantidadS : 0;
 		vectorInsertar(&vIpc, &ipc);
-		//b = (divisiones *)vectorIteradorSiguiente(&itB);
-		//s = (divisiones *)vectorIteradorSiguiente(&itS);
+		ac = (acumuladorRegion *)vectorIteradorSiguiente(&it);
 	}
 
 	vectorMostrar(&vIpc, print);
 
-	vectorDestruir(&vIpc);
+	vectorDestruir(&vAc);
 	return;
 }
-void clasificarDivisiones(Vector *D, Vector *v, const char **filter,
-			  size_t sizeFiltro, const char *grupo)
+int buscarIndiceEnVector(Vector *v, char *fecha, char *region)
+{
+	VectorIterador it;
+	vectorIteradorCrear(&it, v);
+	acumuladorRegion *ac = (acumuladorRegion *)vectorIteradorPrimero(&it);
+	int pos = 0;
+	while (!vectorIteradorFin(&it)) {
+		if (cmpString(ac->fecha, fecha) == 0 &&
+		    cmpString(ac->region, region) == 0) {
+			return pos;
+		}
+		ac = (acumuladorRegion *)vectorIteradorSiguiente(&it);
+		pos++;
+	}
+	acumuladorRegion nuevo = { 0 };
+	cpyString(nuevo.fecha, fecha);
+	cpyString(nuevo.region, region);
+	vectorInsertar(v, &nuevo);
+	return vectorCE(v) - 1;
+}
+void clasificarDivisiones(Vector *D, Vector *v, Clasificar c, Cmp cmp)
 {
 	serie_ipc_divisiones *s = NULL;
 	VectorIterador it;
@@ -106,16 +129,17 @@ void clasificarDivisiones(Vector *D, Vector *v, const char **filter,
 	divisiones div;
 	s = (serie_ipc_divisiones *)vectorIteradorPrimero(&it);
 	while (!vectorIteradorFin(&it)) {
-		if (includeString(s->code, filter, sizeFiltro)) {
+		if (c(s, div.grupo)) {
 			cpyString(div.desc, s->desc);
 			cpyString(div.indice_ipc, s->indice_ipc);
 			cpyString(div.region, s->region);
 			cpyString(div.fecha, s->periodo);
-			cpyString(div.grupo, grupo);
+			//		vectorOrdInsertar(D, &div, cmp);
 			vectorInsertar(D, &div);
 		}
 		s = (serie_ipc_divisiones *)vectorIteradorSiguiente(&it);
 	}
+	//vectorOrdenar(D, INSERCION, cmp);
 }
 void seleccionarRegion(char *region)
 {
@@ -183,4 +207,13 @@ void calcularIPC(char *sDesde, char *sHasta, int monto)
 void promedio(Vector *D, float *grupo, float suma, int count)
 {
 	*grupo = suma / count;
+}
+int promedioMensual(VectorIterador *it, indices *ipc, divisiones *d)
+{
+	int categorias = 0;
+	int cReg = 0;
+	int suma = 0;
+	while (d && strcmp(d->fecha, ipc->fecha) == 0) {
+	}
+	return categorias > 0 ? suma / categorias : 0;
 }

@@ -17,6 +17,14 @@ typedef struct {
 	char region[10];
 	float bienes;
 	float servicios;
+	int cantidadB;
+	int cantidadS;
+} acumuladorRegion;
+typedef struct {
+	char fecha[18];
+	char region[10];
+	float bienes;
+	float servicios;
 } indices;
 typedef struct {
 	char code[21];
@@ -41,11 +49,11 @@ typedef struct {
 	char fechaDesde[18];
 	char fechaHasta[18];
 } filtroIPC;
+typedef bool (*Clasificar)(const void *elem, char *grupo);
 
 void generarHerramienta(filtroIPC filtro, Vector *v);
 void menu(filtroIPC *f);
-void calcularPromedioMensual(Vector *S, Vector *B, Fmt print);
-void clasificarDivisiones(Vector *D, Vector *v, const char **filtro,
-			  size_t sizeFiltro, const char *grupo);
+void calcularPromedios(Vector *D, Fmt print);
+void clasificarDivisiones(Vector *D, Vector *v, Clasificar c, Cmp cmp);
 
 #endif // !DIVISIONES_H
