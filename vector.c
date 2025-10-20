@@ -20,13 +20,6 @@ static bool redimensionarVector(Vector *v, float factor);
 ordenamiento metodos[] = { NULL, ordenarBurbujeo, ordenarInsercion,
 			   ordenarSeleccion, ordenarSeleccion2 };
 
-void *vectorGet(const Vector *v, size_t pos)
-{
-	if (pos < 0 || pos >= v->cantElem)
-		return NULL;
-	return v->vec + pos * v->tamElem;
-}
-
 //Creacion
 int vectorCrear(Vector *v, size_t tam)
 {
@@ -139,7 +132,6 @@ int vectorInsertarDeArchivoTXT(Vector *v, FILE *f, FmtInsert formatear,
 		return ERR_MEM;
 	fgets(elem, v->tamElem, f); //Salteo la cabecera
 	while (fgets(elem, v->tamElem, f) && (count != 0)) {
-		removerCharEnString(elem, '"');
 		void *elemFmt = malloc(v->tamElem);
 		formatear(elem, elemFmt);
 		cod = vectorInsertar(v, elemFmt);
@@ -166,6 +158,16 @@ int vectorGuardarAArchivoTXT(Vector *v, FILE *f, FmtWrite formatear)
 		formatear(f, i);
 	}
 	free(elem);
+	return cod;
+}
+int vectorGuardarAArchivoBIN(Vector *v, FILE *f)
+{
+	int cod = OK;
+	void *ult = v->vec + (v->cantElem - 1) * v->tamElem;
+	void *i = v->vec;
+	for (; i < ult; i += v->tamElem) {
+		fwrite(i, v->tamElem, 1, f);
+	}
 	return cod;
 }
 
@@ -205,6 +207,12 @@ void *vectorOrdBuscar(const Vector *v, void *elem, Cmp cmp)
 		}
 	}
 	return encontrado ? (v->vec + pos) : NULL;
+}
+void *vectorGet(const Vector *v, size_t pos)
+{
+	if (pos < 0 || pos >= v->cantElem)
+		return NULL;
+	return v->vec + pos * v->tamElem;
 }
 
 //Eliminacion
@@ -257,7 +265,7 @@ bool vectorEliminarPorFiltro(Vector *v, CmpFil cmp)
 {
 	void *ult = v->vec + (v->cantElem - 1) * v->tamElem;
 	void *i = v->vec;
-	while (i < ult) {
+	while (i <= ult) {
 		if (cmp(i) == 0) {
 			for (void *j = i + v->tamElem; j <= ult;
 			     j += v->tamElem) {

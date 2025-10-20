@@ -1,14 +1,181 @@
+#include "includes/comun.h"
 #include "includes/string.h"
 #include "includes/divisiones.h"
 #include "includes/vector.h"
 
-int buscarIndiceEnVector(Vector *v, char *fecha, char *region);
-int cmpDivisionesPorFechaYRegion(const void *a, const void *b);
-int promedioMensual(VectorIterador *it, indices *ipc, divisiones *d);
-void calcularIPC(char *sDesde, char *sHasta, int monto);
-void formatearFecha(char *c);
-void seleccionarRegion(char *region);
-void promedio(Vector *D, float *grupo, float suma, int count);
+static void seleccionarPeriodoDivisiones(void *f)
+{
+	char *fechaDesde = ((filtroIPC *)f)->fechaDesde;
+	char *fechaHasta = ((filtroIPC *)f)->fechaHasta;
+	printf("Ingrese una fecha desde (AAAAMM): ");
+	scanf(" %s", fechaDesde);
+	printf("Ingrese una fecha hasta (AAAAMM): ");
+	scanf(" %s", fechaHasta);
+}
+static void seleccionarRegionDivisiones(void *f)
+{
+	char *region = ((filtroIPC *)f)->region;
+	printf("Seleccione la region: \n");
+	printf("1. Nacional\n");
+	printf("2. GBA\n");
+	printf("3. Pampeana\n");
+	printf("4. Cuyo\n");
+	printf("5. Noroeste\n");
+	printf("6. Noreste\n");
+	printf("7. Patagonia\n");
+	int opcion = 0;
+	do {
+		printf("Ingrese una opcion (1-7): ");
+		scanf("%d", &opcion);
+		switch (opcion) {
+		case 1:
+			cpyString(region, "Nacional");
+			break;
+		case 2:
+			cpyString(region, "GBA");
+			break;
+		case 3:
+			cpyString(region, "Pampeana");
+			break;
+		case 4:
+			cpyString(region, "Cuyo");
+			break;
+		case 5:
+			cpyString(region, "Noroeste");
+			break;
+		case 6:
+			cpyString(region, "Noreste");
+			break;
+		case 7:
+			cpyString(region, "Patagonia");
+			break;
+		default:
+			printf("Opcion invalida. Intente de nuevo.\n");
+			break;
+		}
+	} while (opcion < 1 || opcion > 7);
+}
+static void seleccionarMontoDivisiones(void *f)
+{
+	int *monto = &((filtroIPC *)f)->monto;
+	printf("Selecciona el monto: ");
+	scanf("%d", monto);
+}
+static bool filtrarDivisiones(const void *elem, char *grupo)
+{
+	const char *codeB[BIENES] = { "01", "02", "03", "12", "05" };
+	const char *codeS[SERVICIOS] = { "04", "06", "07", "08",
+					 "09", "10", "11" };
+	if (includeString(((serie_ipc_divisiones *)elem)->code, codeB,
+			  BIENES)) {
+		cpyString(grupo, "Bienes");
+		return true;
+	} else if (includeString(((serie_ipc_divisiones *)elem)->code, codeS,
+				 SERVICIOS)) {
+		cpyString(grupo, "Servicios");
+		return true;
+	}
+	return false;
+}
+static int regNacional(const void *elem)
+{
+	indices *i = (indices *)elem;
+	return cmpString(i->region, "Nacional") == 0;
+}
+static void printIPC(const void *elem)
+{
+	indices *i = (indices *)elem;
+	printf("%s;%s;%f;%f\n", i->fecha, i->region, i->bienes, i->servicios);
+}
+static void printNacional(const void *elem)
+{
+	if (cmpString(((indices *)elem)->region, "Nacional") == 0) {
+		printIPC(elem);
+	}
+}
+void formatearDivisiones(char *c, void *elem)
+{
+	removerCharEnString(c, '"');
+	serie_ipc_divisiones *s = (serie_ipc_divisiones *)elem;
+
+	char *act = buscarCharEnStringEnReversa(c, '\n');
+	*act = '\0';
+	act = buscarCharEnStringEnReversa(c, ';');
+	strcpy(s->periodo, act + 1);
+	decodificarFecha(s->periodo);
+	formatearFecha(s->periodo);
+
+	*act = '\0';
+	act = buscarCharEnStringEnReversa(c, ';');
+	strcpy(s->region, act + 1);
+
+	*act = '\0';
+	act = buscarCharEnStringEnReversa(c, ';');
+	strcpy(s->v_a_ipc, act + 1);
+
+	*act = '\0';
+	act = buscarCharEnStringEnReversa(c, ';');
+	strcpy(s->v_m_ipc, act + 1);
+
+	*act = '\0';
+	act = buscarCharEnStringEnReversa(c, ';');
+	strcpy(s->indice_ipc, act + 1);
+	reemplazarCharEnString(s->indice_ipc, ',', '.');
+
+	*act = '\0';
+	act = buscarCharEnStringEnReversa(c, ';');
+	strcpy(s->clasificador, act + 1);
+
+	*act = '\0';
+	act = buscarCharEnStringEnReversa(c, ';');
+	strcpy(s->desc, act + 1);
+	normarlizarPrimerChar(s->desc);
+
+	*act = '\0';
+	strcpy(s->code, c);
+}
+void formatearFecha(char *c)
+{
+	char meses[12][11] = {
+		"Enero",      "Febrero", "Marzo",     "Abril",
+		"Mayo",	      "Junio",	 "Julio",     "Agosto",
+		"Septiembre", "Octubre", "Noviembre", "Diciembre"
+	};
+	char mesReg[3];
+	cpyNString(mesReg, c + 4, 2);
+	int mes = atoi(mesReg) - 1;
+	//AAAAMM
+	size_t len = lenString(meses[mes]);
+	char anio[5];
+	strncpy(anio, c, 4);
+	//MMMMMMMMMM-AAAA
+	memcpy(c, meses[mes], len);
+	c += len;
+	*c = '-';
+	cpyString(c + 1, anio);
+}
+void decodificarFecha(char *fecha)
+{
+	char *cod =
+		"4687195032"; //En el ejercicio no aparece que para el 5 es un 9, pero lo asumo por prueba y error
+	fecha[0] = cod[(int)(*(fecha) - '0')];
+	fecha[1] = cod[(int)(*(fecha + 1) - '0')];
+	fecha[2] = cod[(int)(*(fecha + 2) - '0')];
+	fecha[3] = cod[(int)(*(fecha + 3) - '0')];
+	fecha[4] = cod[(int)(*(fecha + 4) - '0')];
+	fecha[5] = cod[(int)(*(fecha + 5) - '0')];
+}
+
+/***** actualizarMontoDivisiones ******/
+void calcularIPC(char *sDesde, char *sHasta, int monto)
+{
+	float pDesde = atof(sDesde);
+	float pHasta = atof(sHasta);
+	float montoAjustado = monto * (pHasta / pDesde);
+	float variacion = (pHasta / pDesde - 1) * 100;
+	printf("El monto ajustado con una variacion del %f%% es de: %f\n",
+	       variacion, montoAjustado);
+}
 void generarHerramienta(filtroIPC filtro, Vector *v)
 {
 	serie_ipc_divisiones *s;
@@ -16,7 +183,7 @@ void generarHerramienta(filtroIPC filtro, Vector *v)
 	vectorIteradorCrear(&it, v);
 	s = (serie_ipc_divisiones *)vectorIteradorPrimero(&it);
 	int encontrados = 0;
-	char sDesde[17], sHasta[17];
+	char sDesde[PERIODO_DIV_TAM], sHasta[PERIODO_DIV_TAM];
 
 	formatearFecha((char *)filtro.fechaDesde);
 	formatearFecha((char *)filtro.fechaHasta);
@@ -36,27 +203,36 @@ void generarHerramienta(filtroIPC filtro, Vector *v)
 		}
 		s = (serie_ipc_divisiones *)vectorIteradorSiguiente(&it);
 	}
-	puts(sDesde);
-	puts(sHasta);
 	calcularIPC(sDesde, sHasta, filtro.monto);
 }
-void menu(filtroIPC *f)
+void actualizarMontoDivisiones(Vector *v)
 {
-	printf("Ingrese un monto expresado en pesos: ");
-	scanf("%d", &f->monto);
-	printf("Seleccione la region: \n");
-	printf("1. Nacional\n");
-	printf("2. GBA\n");
-	printf("3. Pampeana\n");
-	printf("4. Cuyo\n");
-	printf("5. Noroeste\n");
-	printf("6. Noreste\n");
-	printf("7. Patagonia\n");
-	seleccionarRegion(f->region);
-	printf("Ingrese una fecha desde (AAAAMM): ");
-	scanf(" %s", f->fechaDesde);
-	printf("Ingrese una fecha hasta (AAAAMM): ");
-	scanf(" %s", f->fechaHasta);
+	filtroIPC filtro;
+	menu(&filtro, seleccionarMontoDivisiones, seleccionarRegionDivisiones,
+	     seleccionarPeriodoDivisiones);
+	generarHerramienta(filtro, v);
+}
+
+/***** calcularIPCPromedio ******/
+int buscarIndiceEnVector(Vector *v, char *fecha, char *region)
+{
+	VectorIterador it;
+	vectorIteradorCrear(&it, v);
+	acumuladorRegion *ac = (acumuladorRegion *)vectorIteradorPrimero(&it);
+	int pos = 0;
+	while (!vectorIteradorFin(&it)) {
+		if (cmpString(ac->fecha, fecha) == 0 &&
+		    cmpString(ac->region, region) == 0) {
+			return pos;
+		}
+		ac = (acumuladorRegion *)vectorIteradorSiguiente(&it);
+		pos++;
+	}
+	acumuladorRegion nuevo = { 0 };
+	cpyString(nuevo.fecha, fecha);
+	cpyString(nuevo.region, region);
+	vectorInsertar(v, &nuevo);
+	return vectorCE(v) - 1;
 }
 void calcularPromedios(Vector *D, Fmt print)
 {
@@ -96,124 +272,36 @@ void calcularPromedios(Vector *D, Fmt print)
 		ac = (acumuladorRegion *)vectorIteradorSiguiente(&it);
 	}
 
-	vectorMostrar(&vIpc, print);
+	//	vectorEliminarPorFiltro(&vIpc, regNacional);
+	vectorMostrar(&vIpc, printNacional);
 
 	vectorDestruir(&vAc);
 	return;
 }
-int buscarIndiceEnVector(Vector *v, char *fecha, char *region)
+void clasificarDivisiones(Vector *D, Vector *v, Clasificar c)
 {
-	VectorIterador it;
-	vectorIteradorCrear(&it, v);
-	acumuladorRegion *ac = (acumuladorRegion *)vectorIteradorPrimero(&it);
-	int pos = 0;
-	while (!vectorIteradorFin(&it)) {
-		if (cmpString(ac->fecha, fecha) == 0 &&
-		    cmpString(ac->region, region) == 0) {
-			return pos;
-		}
-		ac = (acumuladorRegion *)vectorIteradorSiguiente(&it);
-		pos++;
-	}
-	acumuladorRegion nuevo = { 0 };
-	cpyString(nuevo.fecha, fecha);
-	cpyString(nuevo.region, region);
-	vectorInsertar(v, &nuevo);
-	return vectorCE(v) - 1;
-}
-void clasificarDivisiones(Vector *D, Vector *v, Clasificar c, Cmp cmp)
-{
-	serie_ipc_divisiones *s = NULL;
 	VectorIterador it;
 	vectorIteradorCrear(&it, v);
 	divisiones div;
-	s = (serie_ipc_divisiones *)vectorIteradorPrimero(&it);
+	serie_ipc_divisiones *s =
+		(serie_ipc_divisiones *)vectorIteradorPrimero(&it);
 	while (!vectorIteradorFin(&it)) {
 		if (c(s, div.grupo)) {
 			cpyString(div.desc, s->desc);
 			cpyString(div.indice_ipc, s->indice_ipc);
 			cpyString(div.region, s->region);
 			cpyString(div.fecha, s->periodo);
-			//		vectorOrdInsertar(D, &div, cmp);
 			vectorInsertar(D, &div);
 		}
 		s = (serie_ipc_divisiones *)vectorIteradorSiguiente(&it);
 	}
-	//vectorOrdenar(D, INSERCION, cmp);
 }
-void seleccionarRegion(char *region)
+void calcularIPCPromedio(Vector *v)
 {
-	int opcion = 0;
-	do {
-		printf("Ingrese una opcion (1-7): ");
-		scanf("%d", &opcion);
-		switch (opcion) {
-		case 1:
-			cpyString(region, "Nacional");
-			break;
-		case 2:
-			cpyString(region, "GBA");
-			break;
-		case 3:
-			cpyString(region, "Pampeana");
-			break;
-		case 4:
-			cpyString(region, "Cuyo");
-			break;
-		case 5:
-			cpyString(region, "Noroeste");
-			break;
-		case 6:
-			cpyString(region, "Noreste");
-			break;
-		case 7:
-			cpyString(region, "Patagonia");
-			break;
-		default:
-			printf("Opcion invalida. Intente de nuevo.\n");
-			break;
-		}
-	} while (opcion < 1 || opcion > 7);
-}
-void formatearFecha(char *c)
-{
-	char meses[12][11] = {
-		"Enero",      "Febrero", "Marzo",     "Abril",
-		"Mayo",	      "Junio",	 "Julio",     "Agosto",
-		"Septiembre", "Octubre", "Noviembre", "Diciembre"
-	};
-	char mesReg[3];
-	cpyNString(mesReg, c + 4, 2);
-	int mes = atoi(mesReg) - 1;
-	//AAAAMM
-	size_t len = lenString(meses[mes]);
-	char anio[5];
-	strncpy(anio, c, 4);
-	//MMMMMMMMMM-AAAA
-	memcpy(c, meses[mes], len);
-	c += len;
-	*c = '-';
-	cpyString(c + 1, anio);
-}
-void calcularIPC(char *sDesde, char *sHasta, int monto)
-{
-	float pDesde = atof(sDesde);
-	float pHasta = atof(sHasta);
-	float montoAjustado = monto * (pHasta / pDesde);
-	float variacion = (pHasta / pDesde - 1) * 100;
-	printf("El monto ajustado con una variacion del %f%% es de: %f",
-	       variacion, montoAjustado);
-}
-void promedio(Vector *D, float *grupo, float suma, int count)
-{
-	*grupo = suma / count;
-}
-int promedioMensual(VectorIterador *it, indices *ipc, divisiones *d)
-{
-	int categorias = 0;
-	int cReg = 0;
-	int suma = 0;
-	while (d && strcmp(d->fecha, ipc->fecha) == 0) {
-	}
-	return categorias > 0 ? suma / categorias : 0;
+	Vector Divisiones;
+	vectorCrear(&Divisiones, sizeof(divisiones));
+	clasificarDivisiones(&Divisiones, v, filtrarDivisiones);
+	calcularPromedios(&Divisiones, printIPC);
+	vectorEliminarPorFiltro(&Divisiones, regNacional);
+	vectorDestruir(&Divisiones);
 }
