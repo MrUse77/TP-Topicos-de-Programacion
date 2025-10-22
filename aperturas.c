@@ -62,19 +62,19 @@ void formatearAperturas(char *c, void *elem)
 
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
-	strcpy(s->region, act + 1);
+	cpyString(s->region, act + 1);
 
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
-	strcpy(s->v_a_ipc, act + 1);
+	cpyString(s->v_a_ipc, act + 1);
 
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
-	strcpy(s->v_m_ipc, act + 1);
+	cpyString(s->v_m_ipc, act + 1);
 
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
-	strcpy(s->indice_ipc, act + 1);
+	cpyString(s->indice_ipc, act + 1);
 	reemplazarCharEnString(s->indice_ipc, ',', '.');
 
 	*act = '\0';
@@ -84,15 +84,15 @@ void formatearAperturas(char *c, void *elem)
 
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
-	strcpy(s->clasificador, act + 1);
+	cpyString(s->clasificador, act + 1);
 
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
-	strcpy(s->desc, act + 1);
+	cpyString(s->desc, act + 1);
 	normarlizarPrimerChar(s->desc);
 
 	*act = '\0';
-	strcpy(s->code, c);
+	cpyString(s->code, c);
 }
 
 void clasificarAperturas(Vector *v, filtroIPC *f, Vector *vA)
@@ -144,7 +144,7 @@ char *formatearFechaAperturas(char *c)
 {
 	char anio[5];
 	cpyNString(anio, c, 4);
-	sprintf(c, "%04d-%02d-01", atoi(anio), atoi(c + 4));
+	snprintf(c, PERIODO_AP_TAM, "%04d-%02d-01", atoi(anio), atoi(c + 4));
 	return c;
 }
 void printAperturas(const void *elem)

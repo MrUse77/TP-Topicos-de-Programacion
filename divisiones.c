@@ -9,8 +9,10 @@ static void seleccionarPeriodoDivisiones(void *f)
 	char *fechaHasta = ((filtroIPC *)f)->fechaHasta;
 	printf("Ingrese una fecha desde (AAAAMM): ");
 	scanf(" %s", fechaDesde);
+	formatearFecha((char *)fechaDesde);
 	printf("Ingrese una fecha hasta (AAAAMM): ");
 	scanf(" %s", fechaHasta);
+	formatearFecha((char *)fechaHasta);
 }
 static void seleccionarRegionDivisiones(void *f)
 {
@@ -101,38 +103,38 @@ void formatearDivisiones(char *c, void *elem)
 	char *act = buscarCharEnStringEnReversa(c, '\n');
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
-	strcpy(s->periodo, act + 1);
+	cpyString(s->periodo, act + 1);
 	decodificarFecha(s->periodo);
 	formatearFecha(s->periodo);
 
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
-	strcpy(s->region, act + 1);
+	cpyString(s->region, act + 1);
 
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
-	strcpy(s->v_a_ipc, act + 1);
+	cpyString(s->v_a_ipc, act + 1);
 
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
-	strcpy(s->v_m_ipc, act + 1);
+	cpyString(s->v_m_ipc, act + 1);
 
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
-	strcpy(s->indice_ipc, act + 1);
+	cpyString(s->indice_ipc, act + 1);
 	reemplazarCharEnString(s->indice_ipc, ',', '.');
 
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
-	strcpy(s->clasificador, act + 1);
+	cpyString(s->clasificador, act + 1);
 
 	*act = '\0';
 	act = buscarCharEnStringEnReversa(c, ';');
-	strcpy(s->desc, act + 1);
+	cpyString(s->desc, act + 1);
 	normarlizarPrimerChar(s->desc);
 
 	*act = '\0';
-	strcpy(s->code, c);
+	cpyString(s->code, c);
 }
 void formatearFecha(char *c)
 {
@@ -147,7 +149,7 @@ void formatearFecha(char *c)
 	//AAAAMM
 	size_t len = lenString(meses[mes]);
 	char anio[5];
-	strncpy(anio, c, 4);
+	cpyNString(anio, c, 4);
 	//MMMMMMMMMM-AAAA
 	memcpy(c, meses[mes], len);
 	c += len;
@@ -185,18 +187,14 @@ void generarHerramienta(filtroIPC filtro, Vector *v)
 	int encontrados = 0;
 	char sDesde[PERIODO_DIV_TAM], sHasta[PERIODO_DIV_TAM];
 
-	formatearFecha((char *)filtro.fechaDesde);
-	formatearFecha((char *)filtro.fechaHasta);
 	while (!vectorIteradorFin(&it) && encontrados != 2) {
 		if (cmpString(s->desc, "Nivel general") == 0 &&
 		    cmpString(s->region, filtro.region) == 0) {
 			if (cmpString(s->periodo, filtro.fechaDesde) == 0) {
-				printf("Encontrado desde: %s\n", s->periodo);
 				cpyString(sDesde, s->indice_ipc);
 				encontrados++;
 			} else if (cmpString(s->periodo, filtro.fechaHasta) ==
 				   0) {
-				printf("Encontrado hasta: %s\n", s->periodo);
 				cpyString(sHasta, s->indice_ipc);
 				encontrados++;
 			}

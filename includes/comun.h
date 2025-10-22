@@ -16,5 +16,7 @@ typedef struct {
 } filtroIPC;
 
 typedef void (*Filtro)(void *filtro);
+
 void menu(void *f, Filtro monto, Filtro region, Filtro periodo);
+
 #endif // !COMUN_H

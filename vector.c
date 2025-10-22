@@ -380,18 +380,12 @@ static bool redimensionarVector(Vector *v, float factor)
 {
 	size_t nuevaCap = v->cap * factor;
 	void *nuevoVec = realloc(v->vec, nuevaCap * v->tamElem);
-	//static int i = 0;
 	if (!nuevoVec) {
 		return false;
 	}
-	printf("Redimension de %zu a %zu\n", v->cap, nuevaCap);
+	//	printf("Redimension de %zu a %zu\n", v->cap, nuevaCap);
 	v->cap = nuevaCap;
 	v->vec = nuevoVec;
-	/*
-	printf("Si pibe me redimensione: %d veces. Ahora a dormir\n", i);
-	i++;
-	sleep(1);
-	*/
 	return true;
 }
 static void *buscar(void *init, void *fin, size_t tamElem, Cmp cmp)

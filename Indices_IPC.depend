@@ -1,28 +1,28 @@
 # depslib dependency file v1.0
-1760885144 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/string.c
+1760929513 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/string.c
 	"includes/string.h"
 	<stddef.h>
 	<stdio.h>
 	"string.h"
 
-1760928354 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/main.c
+1760931458 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/main.c
 	<stddef.h>
 	<stdio.h>
 	"includes/vector.h"
 	"includes/divisiones.h"
 	"includes/aperturas.h"
 
-1760885144 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/string.h
+1760929513 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/string.h
 	<stddef.h>
 	<stdbool.h>
 	<string.h>
 
-1760919177 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/vector.h
+1760929513 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/vector.h
 	<stdbool.h>
 	<stddef.h>
 	<stdio.h>
 
-1760919156 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/vector.c
+1760930189 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/vector.c
 	<stddef.h>
 	"includes/vector.h"
 	"includes/string.h"
@@ -65,13 +65,13 @@
 	"includes/vector.h"
 	"includes/divisiones.h"
 
-1760928911 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/divisiones.c
+1760931409 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/divisiones.c
 	"includes/comun.h"
 	"includes/string.h"
 	"includes/divisiones.h"
 	"includes/vector.h"
 
-1760928651 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/divisiones.h
+1760929513 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/divisiones.h
 	<stdlib.h>
 	<stddef.h>
 	<stdbool.h>
@@ -91,7 +91,7 @@
 	"string.h"
 	"vector.h"
 
-1760928504 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/aperturas.h
+1760929513 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/aperturas.h
 	<stdlib.h>
 	<stddef.h>
 	<stdbool.h>
@@ -99,19 +99,19 @@
 	"vector.h"
 	"comun.h"
 
-1760926033 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/comun.h
+1760930616 /home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/includes/comun.h
 	<stdlib.h>
 	<stddef.h>
 	<stdbool.h>
 	"string.h"
 	"vector.h"
 
-1760927720 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/aperturas.c
+1760931433 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/aperturas.c
 	"includes/aperturas.h"
 	"includes/comun.h"
 	"includes/string.h"
 	"includes/vector.h"
 
-1760926149 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/comun.c
+1760929513 source:/home/agustin/Documentos/unlam/Programacion-UNLAM/Topicos/TP/comun.c
 	"includes/comun.h"
 
